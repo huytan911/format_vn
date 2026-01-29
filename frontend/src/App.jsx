@@ -20,6 +20,8 @@ function App() {
         <Routes>
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/admin/login" element={<Login />} />
+          <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
 
           {/* Admin Routes - Protected */}
           <Route element={<ProtectedRoute />}>

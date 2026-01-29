@@ -29,7 +29,8 @@ public class CategoriesController : ControllerBase
     public async Task<ActionResult<Category>> GetCategory(int id)
     {
         var category = await _context.Categories
-            .Include(c => c.Products)
+            .Include(c => c.ProductCategories)
+            .ThenInclude(pc => pc.Product)
             .FirstOrDefaultAsync(c => c.Id == id);
             
         if (category == null)

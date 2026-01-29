@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using FormatVnShop.Data;
 using FormatVnShop.Models;
+using FormatVnShop.Models.DTOs;
 
 namespace FormatVnShop.Controllers;
 
@@ -19,19 +20,23 @@ public class ProductsController : ControllerBase
     
     // GET: api/products
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
     {
-        return await _context.Products
-            .Include(p => p.Category)
+        var products = await _context.Products
+            .Include(p => p.ProductCategories)
+            .ThenInclude(pc => pc.Category)
             .ToListAsync();
+
+        return products.Select(MapToDto).ToList();
     }
     
     // GET: api/products/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetProduct(int id)
+    public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
         var product = await _context.Products
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategories)
+            .ThenInclude(pc => pc.Category)
             .FirstOrDefaultAsync(p => p.Id == id);
             
         if (product == null)
@@ -39,53 +44,124 @@ public class ProductsController : ControllerBase
             return NotFound();
         }
         
-        return product;
+        return MapToDto(product);
     }
     
     // GET: api/products/category/1
     [HttpGet("category/{categoryId}")]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory(int categoryId)
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(int categoryId)
     {
-        return await _context.Products
-            .Include(p => p.Category)
-            .Where(p => p.CategoryId == categoryId)
+        var products = await _context.Products
+            .Include(p => p.ProductCategories)
+            .ThenInclude(pc => pc.Category)
+            .Where(p => p.ProductCategories.Any(pc => pc.CategoryId == categoryId))
             .ToListAsync();
+            
+        return products.Select(MapToDto).ToList();
     }
     
     // GET: api/products/featured
     [HttpGet("featured")]
-    public async Task<ActionResult<IEnumerable<Product>>> GetFeaturedProducts()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetFeaturedProducts()
     {
-        return await _context.Products
-            .Include(p => p.Category)
+        var products = await _context.Products
+            .Include(p => p.ProductCategories)
+            .ThenInclude(pc => pc.Category)
             .Where(p => p.IsFeatured)
             .Take(6)
             .ToListAsync();
+            
+        return products.Select(MapToDto).ToList();
     }
     
     // POST: api/products
     [HttpPost]
     [Authorize(Roles = "SuperAdmin,Manager,Staff")]
-    public async Task<ActionResult<Product>> CreateProduct(Product product)
+    public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductDto dto)
     {
-        product.CreatedAt = DateTime.Now;
+        var product = new Product
+        {
+            Name = dto.Name,
+            Description = dto.Description,
+            Price = dto.Price,
+            ImageUrl = dto.ImageUrl,
+            Stock = dto.Stock,
+            IsFeatured = dto.IsFeatured,
+            CreatedAt = DateTime.Now
+        };
+
+        // Add Categories
+        if (dto.CategoryIds != null && dto.CategoryIds.Any())
+        {
+            foreach (var catId in dto.CategoryIds)
+            {
+                var category = await _context.Categories.FindAsync(catId);
+                if (category != null)
+                {
+                    product.ProductCategories.Add(new ProductCategory
+                    {
+                        Product = product,
+                        ProductId = product.Id, // Will be set after save? No, EF handles this graph
+                        Category = category,
+                        CategoryId = catId
+                    });
+                }
+            }
+        }
+        
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+        
+        // Reload to get populated categories
+        return await GetProduct(product.Id);
     }
 
     // PUT: api/products/5
     [HttpPut("{id}")]
     [Authorize(Roles = "SuperAdmin,Manager,Staff")]
-    public async Task<IActionResult> UpdateProduct(int id, Product product)
+    public async Task<IActionResult> UpdateProduct(int id, UpdateProductDto dto)
     {
-        if (id != product.Id)
+        if (id != dto.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(product).State = EntityState.Modified;
+        var product = await _context.Products
+            .Include(p => p.ProductCategories)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        product.Name = dto.Name;
+        product.Description = dto.Description;
+        product.Price = dto.Price;
+        product.ImageUrl = dto.ImageUrl;
+        product.Stock = dto.Stock;
+        product.IsFeatured = dto.IsFeatured;
+        
+        // Update Categories
+        // Remove existing
+        _context.ProductCategories.RemoveRange(product.ProductCategories);
+        
+        // Add new
+        if (dto.CategoryIds != null)
+        {
+            foreach (var catId in dto.CategoryIds)
+            {
+                var category = await _context.Categories.FindAsync(catId);
+                if (category != null)
+                {
+                    _context.ProductCategories.Add(new ProductCategory
+                    {
+                        ProductId = product.Id,
+                        CategoryId = catId
+                    });
+                }
+            }
+        }
 
         try
         {
@@ -126,5 +202,26 @@ public class ProductsController : ControllerBase
     private bool ProductExists(int id)
     {
         return _context.Products.Any(e => e.Id == id);
+    }
+    
+    private static ProductDto MapToDto(Product p)
+    {
+        return new ProductDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            ImageUrl = p.ImageUrl,
+            Stock = p.Stock,
+            IsFeatured = p.IsFeatured,
+            CreatedAt = p.CreatedAt,
+            Categories = p.ProductCategories.Select(pc => new CategoryDto
+            {
+                Id = pc.Category.Id,
+                Name = pc.Category.Name,
+                ImageUrl = pc.Category.ImageUrl
+            }).ToList()
+        };
     }
 }

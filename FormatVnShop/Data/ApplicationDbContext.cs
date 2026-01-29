@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<ProductCategory> ProductCategories { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
@@ -20,6 +21,20 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        // Configure Many-to-Many
+        modelBuilder.Entity<ProductCategory>()
+            .HasKey(pc => new { pc.ProductId, pc.CategoryId });
+            
+        modelBuilder.Entity<ProductCategory>()
+            .HasOne(pc => pc.Product)
+            .WithMany(p => p.ProductCategories)
+            .HasForeignKey(pc => pc.ProductId);
+            
+        modelBuilder.Entity<ProductCategory>()
+            .HasOne(pc => pc.Category)
+            .WithMany(c => c.ProductCategories)
+            .HasForeignKey(pc => pc.CategoryId);
         
         // Seed Categories
         modelBuilder.Entity<Category>().HasData(
@@ -37,7 +52,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Áo măng tô dạ khâu tay dây lưng rời",
                 Description = "Masterpiece by FORMAT. Kỹ thuật khâu tay thủ công tỉ mỉ, chất liệu dạ ấm áp (80% wool). Dáng suông dài, cổ hai ve.",
                 Price = 1827000,
-                CategoryId = 1,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10000752.jpg",
                 Stock = 15,
                 IsFeatured = true,
@@ -49,7 +64,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Quần ống suông dạ dây lưng rời",
                 Description = "Quần ống suông chất liệu dạ cao cấp, đi kèm dây lưng rời. Phong cách lịch lãm cho phái nữ.",
                 Price = 1290000,
-                CategoryId = 1,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10005601.jpg",
                 Stock = 25,
                 IsFeatured = true,
@@ -61,7 +76,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Áo Gile dạ 2 lớp không cổ",
                 Description = "Thiết kế 2 lớp dày dặn, không cổ trẻ trung. Chất liệu dạ mịn, giữ ấm tốt.",
                 Price = 1290000,
-                CategoryId = 1,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10005588.jpg",
                 Stock = 30,
                 IsFeatured = false,
@@ -73,7 +88,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Chân váy dạ 2 lớp cạp liền chun",
                 Description = "Chân váy dạ 2 lớp, thiết kế cạp chun thoải mái, lịch sự cho công sở.",
                 Price = 1590000,
-                CategoryId = 1,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10005515.jpg",
                 Stock = 20,
                 IsFeatured = true,
@@ -87,7 +102,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Áo polo nam không đường may cổ đức",
                 Description = "Công nghệ không đường may hiện đại, chất liệu cotton cao cấp, thoáng khí và bền màu.",
                 Price = 1014000,
-                CategoryId = 2,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10005496.jpg",
                 Stock = 40,
                 IsFeatured = true,
@@ -99,7 +114,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Áo khoác tay dài nam",
                 Description = "Áo khoác nam thiết kế sang trọng, chất liệu cao cấp, giữ ấm hiệu quả cho mùa đông.",
                 Price = 3570000,
-                CategoryId = 2,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10005390.jpg",
                 Stock = 35,
                 IsFeatured = false,
@@ -111,7 +126,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Quần ống bó nỉ cạp chun luồn dây",
                 Description = "Quần nỉ nam năng động, cạp chun có dây rút, phù hợp cho phong cách thể thao/dạo phố.",
                 Price = 750000,
-                CategoryId = 2,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10004947.jpg",
                 Stock = 18,
                 IsFeatured = true,
@@ -123,12 +138,24 @@ public class ApplicationDbContext : DbContext
                 Name = "Áo giữ nhiệt WarmMax Light cổ tròn",
                 Description = "Công nghệ giữ nhiệt WarmMax độc quyền, mỏng nhẹ, giữ ấm cơ thể tối ưu.",
                 Price = 245000,
-                CategoryId = 2,
+                // CategoryId removed
                 ImageUrl = "https://format.vn/media/catalog/product/1/0/10000183.jpg",
                 Stock = 12,
                 IsFeatured = true,
                 CreatedAt = DateTime.Now
             }
+        );
+        
+        // Seed ProductCategories
+        modelBuilder.Entity<ProductCategory>().HasData(
+            new ProductCategory { ProductId = 1, CategoryId = 1 },
+            new ProductCategory { ProductId = 2, CategoryId = 1 },
+            new ProductCategory { ProductId = 3, CategoryId = 1 },
+            new ProductCategory { ProductId = 4, CategoryId = 1 },
+            new ProductCategory { ProductId = 5, CategoryId = 2 },
+            new ProductCategory { ProductId = 6, CategoryId = 2 },
+            new ProductCategory { ProductId = 7, CategoryId = 2 },
+            new ProductCategory { ProductId = 8, CategoryId = 2 }
         );
         
         // Seed Customers

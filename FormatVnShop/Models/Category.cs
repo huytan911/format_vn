@@ -8,5 +8,5 @@ public class Category
     public string? ImageUrl { get; set; }
     
     // Navigation property
-    public ICollection<Product> Products { get; set; } = new List<Product>();
+    public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 }

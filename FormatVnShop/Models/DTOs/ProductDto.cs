@@ -1,6 +1,6 @@
-namespace FormatVnShop.Models;
+namespace FormatVnShop.Models.DTOs;
 
-public class Product
+public class ProductDto
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -10,7 +10,12 @@ public class Product
     public int Stock { get; set; }
     public bool IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
-    
-    // Navigation property
-    public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    public List<CategoryDto> Categories { get; set; } = new();
+}
+
+public class CategoryDto
+{
+    public int Id { get; set; }
+    public required string Name { get; set; }
+    public string? ImageUrl { get; set; }
 }

@@ -3,6 +3,7 @@ import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
+import MultiSelect from '../../components/MultiSelect/MultiSelect';
 import '../../styles/admin.css';
 
 const AdminProducts = () => {
@@ -15,7 +16,7 @@ const AdminProducts = () => {
         name: '',
         description: '',
         price: '',
-        categoryId: '',
+        categoryIds: [],
         imageUrl: '',
         stock: '',
         isFeatured: false
@@ -52,7 +53,7 @@ const AdminProducts = () => {
             name: '',
             description: '',
             price: '',
-            categoryId: '',
+            categoryIds: [],
             imageUrl: '',
             stock: '',
             isFeatured: false
@@ -66,7 +67,7 @@ const AdminProducts = () => {
             name: product.name,
             description: product.description || '',
             price: product.price,
-            categoryId: product.categoryId,
+            categoryIds: product.categories ? product.categories.map(c => c.id) : [],
             imageUrl: product.imageUrl || '',
             stock: product.stock,
             isFeatured: product.isFeatured
@@ -85,13 +86,13 @@ const AdminProducts = () => {
             const data = {
                 ...formData,
                 price: parseFloat(formData.price),
-                categoryId: parseInt(formData.categoryId),
                 stock: parseInt(formData.stock),
-                createdAt: selectedProduct ? selectedProduct.createdAt : new Date().toISOString()
+                categoryIds: formData.categoryIds.map(id => parseInt(id)),
+                id: selectedProduct ? selectedProduct.id : undefined
             };
 
             if (selectedProduct) {
-                await axios.put(`${API_URL}/products/${selectedProduct.id}`, { ...data, id: selectedProduct.id });
+                await axios.put(`${API_URL}/products/${selectedProduct.id}`, data);
             } else {
                 await axios.post(`${API_URL}/products`, data);
             }
@@ -115,13 +116,36 @@ const AdminProducts = () => {
         }
     };
 
+    const handleCategoryChange = (catId) => {
+        const id = parseInt(catId);
+        setFormData(prev => {
+            if (prev.categoryIds.includes(id)) {
+                return { ...prev, categoryIds: prev.categoryIds.filter(c => c !== id) };
+            } else {
+                return { ...prev, categoryIds: [...prev.categoryIds, id] };
+            }
+        });
+    };
+
     const columns = [
         { header: 'ID', accessor: 'id', sortable: true },
         { header: 'Tên sản phẩm', accessor: 'name', sortable: true },
         {
             header: 'Danh mục',
-            accessor: 'category.name',
-            render: (item) => item.category?.name || 'N/A'
+            accessor: 'categories',
+            render: (item) => (
+                <div className="category-tags">
+                    {item.categories && item.categories.length > 0 ? (
+                        item.categories.map(cat => (
+                            <span key={cat.id} className="badge badge-info mr-1">
+                                {cat.name}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="text-gray">Chưa phân loại</span>
+                    )}
+                </div>
+            )
         },
         {
             header: 'Giá',
@@ -175,17 +199,13 @@ const AdminProducts = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Danh mục *</label>
-                            <select
-                                value={formData.categoryId}
-                                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                required
-                            >
-                                <option value="">Chọn danh mục</option>
-                                {categories.map(cat => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
-                            </select>
+                            <label>Danh mục</label>
+                            <MultiSelect
+                                options={categories}
+                                selectedIds={formData.categoryIds}
+                                onChange={(newSelectedIds) => setFormData({ ...formData, categoryIds: newSelectedIds })}
+                                placeholder="Chọn danh mục..."
+                            />
                         </div>
                     </div>
 

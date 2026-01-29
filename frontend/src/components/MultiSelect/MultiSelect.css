@@ -1,0 +1,125 @@
+.multi-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.multi-select-trigger {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 42px;
+    transition: all 0.2s;
+}
+
+.multi-select-trigger:hover {
+    border-color: #bfa980;
+}
+
+.multi-select-trigger.open {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(191, 169, 128, 0.2);
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+}
+
+.tag {
+    background-color: #f0ebe0;
+    color: var(--text-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.remove-tag {
+    cursor: pointer;
+    font-weight: bold;
+    color: #888;
+}
+
+.remove-tag:hover {
+    color: #d32f2f;
+}
+
+.placeholder {
+    color: #999;
+}
+
+.arrow {
+    font-size: 0.8rem;
+    color: #666;
+    margin-left: 8px;
+}
+
+.multi-select-dropdown {
+    position: absolute;
+    top: 105%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.search-container {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+}
+
+.search-container input:focus {
+    border-color: var(--primary-color);
+}
+
+.options-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.option {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.option:hover {
+    background-color: #f9f9f9;
+}
+
+.option.selected {
+    background-color: #f0ebe0;
+}
+
+.no-options {
+    padding: 12px;
+    color: #999;
+    text-align: center;
+}
