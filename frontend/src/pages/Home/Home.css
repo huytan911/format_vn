@@ -1,0 +1,72 @@
+.home-page {
+    flex: 1;
+}
+
+.promo-section {
+    padding: var(--spacing-2xl) 0;
+    background-color: var(--color-gray-light);
+}
+
+.promo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.promo-card {
+    position: relative;
+    height: 500px;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition-medium);
+}
+
+.promo-card:hover {
+    transform: scale(1.02);
+}
+
+.promo-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--spacing-xl);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: var(--color-white);
+}
+
+.promo-content h3 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--spacing-sm);
+}
+
+.promo-link {
+    color: var(--color-white);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: opacity var(--transition-fast);
+}
+
+.promo-link:hover {
+    opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+    .promo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .promo-card {
+        height: 400px;
+    }
+
+    .promo-content h3 {
+        font-size: 1.5rem;
+    }
+}

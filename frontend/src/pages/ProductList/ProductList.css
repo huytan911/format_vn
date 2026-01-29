@@ -1,0 +1,41 @@
+.product-list-page {
+    flex: 1;
+    min-height: 60vh;
+}
+
+.page-header {
+    background-color: var(--color-gray-light);
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-xl);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-sm);
+}
+
+.page-description {
+    text-align: center;
+    color: var(--color-gray-dark);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        padding: var(--spacing-lg) 0;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+    }
+
+    .page-description {
+        font-size: 1rem;
+    }
+}
