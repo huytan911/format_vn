@@ -48,6 +48,12 @@
     overflow-x: auto;
     border-radius: 12px;
     margin-bottom: 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    display: none;
 }
 
 .data-table {

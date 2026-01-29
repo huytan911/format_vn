@@ -30,6 +30,12 @@
     overflow-y: auto;
     animation: slideUp 0.3s ease-out;
     border: 1px solid rgba(99, 179, 237, 0.2);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.modal-content::-webkit-scrollbar {
+    display: none;
 }
 
 @keyframes slideUp {

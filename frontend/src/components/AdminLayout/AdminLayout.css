@@ -45,6 +45,12 @@
     flex: 1;
     padding: 24px 16px;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    display: none;
 }
 
 .nav-item {
@@ -110,6 +116,12 @@
     flex: 1;
     margin-left: 280px;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.admin-main::-webkit-scrollbar {
+    display: none;
 }
 
 .admin-content {
@@ -130,124 +142,125 @@
         padding: 20px;
     }
 }
+
 .user-profile {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  background: rgba(45, 55, 72, 0.4);
-  margin: 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(99, 179, 237, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: rgba(45, 55, 72, 0.4);
+    margin: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(99, 179, 237, 0.1);
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: white;
-  margin-right: 12px;
-  font-size: 18px;
-  box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    margin-right: 12px;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
 }
 
 .user-info {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .username {
-  color: #e2e8f0;
-  font-weight: 600;
-  font-size: 14px;
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 14px;
 }
 
 .role-badge {
-  color: #a0aec0;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 2px;
+    color: #a0aec0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
 }
 
 .logout-btn {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: 2px solid transparent;
-  cursor: pointer;
-  margin-top: auto;
-  color: #f56565 !important;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 2px solid transparent;
+    cursor: pointer;
+    margin-top: auto;
+    color: #f56565 !important;
 }
 
 .logout-btn:hover {
-  background: rgba(245, 101, 101, 0.1) !important;
-  border-color: rgba(245, 101, 101, 0.2) !important;
-  color: #fc8181 !important;
-  transform: translateX(6px);
+    background: rgba(245, 101, 101, 0.1) !important;
+    border-color: rgba(245, 101, 101, 0.2) !important;
+    color: #fc8181 !important;
+    transform: translateX(6px);
 }
 
 .user-profile {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  background: rgba(45, 55, 72, 0.4);
-  margin: 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(99, 179, 237, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: rgba(45, 55, 72, 0.4);
+    margin: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(99, 179, 237, 0.1);
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: white;
-  margin-right: 12px;
-  font-size: 18px;
-  box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    margin-right: 12px;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
 }
 
 .user-info {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .username {
-  color: #e2e8f0;
-  font-weight: 600;
-  font-size: 14px;
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 14px;
 }
 
 .role-badge {
-  color: #a0aec0;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 2px;
+    color: #a0aec0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
 }
 
 .logout-btn {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: 2px solid transparent;
-  cursor: pointer;
-  margin-top: auto;
-  color: #f56565 !important;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 2px solid transparent;
+    cursor: pointer;
+    margin-top: auto;
+    color: #f56565 !important;
 }
 
 .logout-btn:hover {
-  background: rgba(245, 101, 101, 0.1) !important;
-  border-color: rgba(245, 101, 101, 0.2) !important;
-  color: #fc8181 !important;
-  transform: translateX(6px);
+    background: rgba(245, 101, 101, 0.1) !important;
+    border-color: rgba(245, 101, 101, 0.2) !important;
+    color: #fc8181 !important;
+    transform: translateX(6px);
 }
