@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
@@ -11,7 +11,9 @@ const AdminProducts = () => {
     const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isRemoveCategoryModalOpen, setIsRemoveCategoryModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [categoryToRemove, setCategoryToRemove] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -22,8 +24,6 @@ const AdminProducts = () => {
         isFeatured: false
     });
 
-    const API_URL = 'http://localhost:5149/api';
-
     useEffect(() => {
         fetchProducts();
         fetchCategories();
@@ -31,7 +31,7 @@ const AdminProducts = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`${API_URL}/products`);
+            const response = await api.get('/products');
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -40,7 +40,7 @@ const AdminProducts = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`${API_URL}/categories`);
+            const response = await api.get('/categories');
             setCategories(response.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -92,9 +92,9 @@ const AdminProducts = () => {
             };
 
             if (selectedProduct) {
-                await axios.put(`${API_URL}/products/${selectedProduct.id}`, data);
+                await api.put(`/products/${selectedProduct.id}`, data);
             } else {
-                await axios.post(`${API_URL}/products`, data);
+                await api.post('/products', data);
             }
 
             setIsModalOpen(false);
@@ -107,13 +107,49 @@ const AdminProducts = () => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`${API_URL}/products/${selectedProduct.id}`);
+            await api.delete(`/products/${selectedProduct.id}`);
             setIsDeleteModalOpen(false);
             fetchProducts();
         } catch (error) {
             console.error('Error deleting product:', error);
             alert('Lỗi khi xóa sản phẩm');
         }
+    };
+
+    const confirmRemoveCategory = async () => {
+        if (!categoryToRemove) return;
+
+        const { product, categoryId } = categoryToRemove;
+
+        try {
+            const currentCategoryIds = product.categories.map(c => c.id);
+            const newCategoryIds = currentCategoryIds.filter(id => id !== categoryId);
+
+            const updateData = {
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                imageUrl: product.imageUrl,
+                stock: product.stock,
+                isFeatured: product.isFeatured,
+                categoryIds: newCategoryIds
+            };
+
+            await api.put(`/products/${product.id}`, updateData);
+            setIsRemoveCategoryModalOpen(false);
+            setCategoryToRemove(null);
+            fetchProducts();
+        } catch (error) {
+            console.error('Error removing category:', error);
+            alert('Lỗi khi xóa danh mục khỏi sản phẩm');
+        }
+    };
+
+    const handleRemoveCategory = (e, product, categoryId) => {
+        e.stopPropagation();
+        setCategoryToRemove({ product, categoryId });
+        setIsRemoveCategoryModalOpen(true);
     };
 
     const handleCategoryChange = (catId) => {
@@ -137,8 +173,15 @@ const AdminProducts = () => {
                 <div className="category-tags">
                     {item.categories && item.categories.length > 0 ? (
                         item.categories.map(cat => (
-                            <span key={cat.id} className="badge badge-info mr-1">
+                            <span key={cat.id} className="badge badge-info mr-1 category-badge-pill">
                                 {cat.name}
+                                <span
+                                    className="remove-cat-btn"
+                                    onClick={(e) => handleRemoveCategory(e, item, cat.id)}
+                                    title="Xóa danh mục này"
+                                >
+                                    ×
+                                </span>
                             </span>
                         ))
                     ) : (
@@ -286,6 +329,33 @@ const AdminProducts = () => {
                             Hủy
                         </button>
                         <button className="btn-danger" onClick={confirmDelete}>
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+            <Modal
+                isOpen={isRemoveCategoryModalOpen}
+                onClose={() => setIsRemoveCategoryModalOpen(false)}
+                title="Xác nhận xóa danh mục"
+                size="small"
+            >
+                <div className="delete-confirmation">
+                    <p>
+                        Bạn có chắc chắn muốn xóa danh mục khỏi sản phẩm
+                        <strong> "{categoryToRemove?.product?.name}"</strong>?
+                    </p>
+                    <div className="form-actions">
+                        <button
+                            className="btn-secondary"
+                            onClick={() => setIsRemoveCategoryModalOpen(false)}
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            className="btn-danger"
+                            onClick={confirmRemoveCategory}
+                        >
                             Xóa
                         </button>
                     </div>
