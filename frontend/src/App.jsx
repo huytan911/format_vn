@@ -17,6 +17,7 @@ import AdminProducts from './pages/Admin/AdminProducts';
 import AdminCategories from './pages/Admin/AdminCategories';
 import AdminCustomers from './pages/Admin/AdminCustomers';
 import AdminOrders from './pages/Admin/AdminOrders';
+import AdminProductEdit from './pages/Admin/AdminProductEdit';
 import CustomerLogin from './pages/Auth/CustomerLogin';
 import CustomerRegister from './pages/Auth/CustomerRegister';
 import Profile from './pages/Customer/Profile';
@@ -42,6 +43,8 @@ function App() {
                 {/* Admin Routes - Protected */}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/admin/products" element={<AdminProducts />} />
+                  <Route path="/admin/products/new" element={<AdminProductEdit />} />
+                  <Route path="/admin/products/edit/:id" element={<AdminProductEdit />} />
                   <Route path="/admin/categories" element={<AdminCategories />} />
                   <Route path="/admin/customers" element={<AdminCustomers />} />
                   <Route path="/admin/orders" element={<AdminOrders />} />

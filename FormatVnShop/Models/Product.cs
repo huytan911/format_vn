@@ -12,4 +12,5 @@ public class Product : BaseEntity
     
     // Navigation property
     public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
 }

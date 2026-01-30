@@ -12,6 +12,8 @@ public class CartItem : BaseEntity
     [Required]
     public int ProductId { get; set; }
     
+    public int? ProductVariantId { get; set; }
+    
     [Required]
     [Range(1, int.MaxValue)]
     public int Quantity { get; set; }
@@ -19,4 +21,5 @@ public class CartItem : BaseEntity
     // Navigation properties
     public Customer? Customer { get; set; }
     public Product? Product { get; set; }
+    public ProductVariant? ProductVariant { get; set; }
 }

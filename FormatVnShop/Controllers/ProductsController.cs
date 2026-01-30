@@ -20,13 +20,50 @@ public class ProductsController : ControllerBase
     
     // GET: api/products
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] decimal? minPrice = null,
+        [FromQuery] decimal? maxPrice = null,
+        [FromQuery] bool? inStock = null)
     {
-        var products = await _context.Products
+        var query = _context.Products
             .Include(p => p.ProductCategories)
             .ThenInclude(pc => pc.Category)
-            .ToListAsync();
+            .Include(p => p.Variants)
+            .AsQueryable();
 
+        // Filtering
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query = query.Where(p => p.Name.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm)));
+        }
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        if (inStock.HasValue && inStock.Value)
+        {
+            query = query.Where(p => p.Stock > 0);
+        }
+
+        // Sorting
+        query = sortBy switch
+        {
+            "price_asc" => query.OrderBy(p => p.Price),
+            "price_desc" => query.OrderByDescending(p => p.Price),
+            "newest" => query.OrderByDescending(p => p.CreatedAt),
+            _ => query.OrderByDescending(p => p.Id)
+        };
+
+        var products = await query.ToListAsync();
         return products.Select(MapToDto).ToList();
     }
     
@@ -37,6 +74,7 @@ public class ProductsController : ControllerBase
         var product = await _context.Products
             .Include(p => p.ProductCategories)
             .ThenInclude(pc => pc.Category)
+            .Include(p => p.Variants)
             .FirstOrDefaultAsync(p => p.Id == id);
             
         if (product == null)
@@ -49,14 +87,52 @@ public class ProductsController : ControllerBase
     
     // GET: api/products/category/1
     [HttpGet("category/{categoryId}")]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(int categoryId)
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(
+        int categoryId,
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] decimal? minPrice = null,
+        [FromQuery] decimal? maxPrice = null,
+        [FromQuery] bool? inStock = null)
     {
-        var products = await _context.Products
+        var query = _context.Products
             .Include(p => p.ProductCategories)
             .ThenInclude(pc => pc.Category)
+            .Include(p => p.Variants)
             .Where(p => p.ProductCategories.Any(pc => pc.CategoryId == categoryId))
-            .ToListAsync();
-            
+            .AsQueryable();
+
+        // Filtering
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query = query.Where(p => p.Name.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm)));
+        }
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        if (inStock.HasValue && inStock.Value)
+        {
+            query = query.Where(p => p.Stock > 0);
+        }
+
+        // Sorting
+        query = sortBy switch
+        {
+            "price_asc" => query.OrderBy(p => p.Price),
+            "price_desc" => query.OrderByDescending(p => p.Price),
+            "newest" => query.OrderByDescending(p => p.CreatedAt),
+            _ => query.OrderByDescending(p => p.Id)
+        };
+
+        var products = await query.ToListAsync();
         return products.Select(MapToDto).ToList();
     }
     
@@ -89,7 +165,6 @@ public class ProductsController : ControllerBase
             IsFeatured = dto.IsFeatured
         };
 
-        // Add Categories
         if (dto.CategoryIds != null && dto.CategoryIds.Any())
         {
             foreach (var catId in dto.CategoryIds)
@@ -105,6 +180,25 @@ public class ProductsController : ControllerBase
                         CategoryId = catId
                     });
                 }
+            }
+        }
+
+        // Add Variants
+        if (dto.Variants != null && dto.Variants.Any())
+        {
+            foreach (var v in dto.Variants)
+            {
+                product.Variants.Add(new ProductVariant
+                {
+                    Color = v.Color,
+                    Material = v.Material,
+                    Size = v.Size,
+                    SKU = v.SKU,
+                    Price = v.Price,
+                    Stock = v.Stock,
+                    ImageUrl = v.ImageUrl,
+                    CreatedAt = DateTime.Now
+                });
             }
         }
         
@@ -131,6 +225,7 @@ public class ProductsController : ControllerBase
         try {
             var product = await _context.Products
                 .Include(p => p.ProductCategories)
+                .Include(p => p.Variants)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -188,6 +283,48 @@ public class ProductsController : ControllerBase
                     {
                         Console.WriteLine($"[UpdateProduct] Category {catId} not found");
                     }
+                }
+            }
+
+            // Update Variants
+            // Remove variants not in the new list
+            var newVariantIds = dto.Variants.Where(v => v.Id > 0).Select(v => v.Id).ToList();
+            var variantsToRemove = product.Variants.Where(v => !newVariantIds.Contains(v.Id)).ToList();
+            if (variantsToRemove.Any())
+            {
+                _context.ProductVariants.RemoveRange(variantsToRemove);
+            }
+
+            // Update or Add variants
+            foreach (var vDto in dto.Variants)
+            {
+                if (vDto.Id > 0)
+                {
+                    var existingV = product.Variants.FirstOrDefault(v => v.Id == vDto.Id);
+                    if (existingV != null)
+                    {
+                        existingV.Color = vDto.Color;
+                        existingV.Material = vDto.Material;
+                        existingV.Size = vDto.Size;
+                        existingV.SKU = vDto.SKU;
+                        existingV.Price = vDto.Price;
+                        existingV.Stock = vDto.Stock;
+                        existingV.ImageUrl = vDto.ImageUrl;
+                    }
+                }
+                else
+                {
+                    product.Variants.Add(new ProductVariant
+                    {
+                        Color = vDto.Color,
+                        Material = vDto.Material,
+                        Size = vDto.Size,
+                        SKU = vDto.SKU,
+                        Price = vDto.Price,
+                        Stock = vDto.Stock,
+                        ImageUrl = vDto.ImageUrl,
+                        CreatedAt = DateTime.Now
+                    });
                 }
             }
 
@@ -255,6 +392,20 @@ public class ProductsController : ControllerBase
                 ImageUrl = pc.Category.ImageUrl,
                 CreatedAt = pc.Category.CreatedAt,
                 UpdatedAt = pc.Category.UpdatedAt
+            }).ToList(),
+            Variants = p.Variants.Select(v => new ProductVariantDto
+            {
+                Id = v.Id,
+                ProductId = v.ProductId,
+                Color = v.Color,
+                Material = v.Material,
+                Size = v.Size,
+                SKU = v.SKU,
+                Price = v.Price,
+                Stock = v.Stock,
+                ImageUrl = v.ImageUrl,
+                CreatedAt = v.CreatedAt,
+                UpdatedAt = v.UpdatedAt
             }).ToList()
         };
     }

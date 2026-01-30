@@ -40,6 +40,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<AdminUser> AdminUsers { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<WishlistItem> WishlistItems { get; set; }
+    public DbSet<ProductVariant> ProductVariants { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -191,6 +192,13 @@ public class ApplicationDbContext : DbContext
             new ProductCategory { ProductId = 6, CategoryId = 2 },
             new ProductCategory { ProductId = 7, CategoryId = 2 },
             new ProductCategory { ProductId = 8, CategoryId = 2 }
+        );
+
+        // Seed ProductVariants
+        modelBuilder.Entity<ProductVariant>().HasData(
+            new ProductVariant { Id = 1, ProductId = 1, Color = "Cam", Size = "S", Stock = 5, Material = "Dạ", SKU = "AMT-CAM-S", CreatedAt = DateTime.Now },
+            new ProductVariant { Id = 2, ProductId = 1, Color = "Cam", Size = "M", Stock = 5, Material = "Dạ", SKU = "AMT-CAM-M", CreatedAt = DateTime.Now },
+            new ProductVariant { Id = 3, ProductId = 1, Color = "Cam", Size = "L", Stock = 5, Material = "Dạ", SKU = "AMT-CAM-L", CreatedAt = DateTime.Now }
         );
         
         // Seed Customers

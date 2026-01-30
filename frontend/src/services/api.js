@@ -2,9 +2,9 @@ import api from '../config/axiosConfig';
 
 // Products API
 export const productsAPI = {
-  getAll: () => api.get('/products'),
+  getAll: (params) => api.get('/products', { params }),
   getById: (id) => api.get(`/products/${id}`),
-  getByCategory: (categoryId) => api.get(`/products/category/${categoryId}`),
+  getByCategory: (categoryId, params) => api.get(`/products/category/${categoryId}`, { params }),
   getFeatured: () => api.get('/products/featured'),
 };
 

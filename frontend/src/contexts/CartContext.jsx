@@ -38,7 +38,11 @@ export const CartProvider = ({ children }) => {
 
             // Sync each item to backend
             for (const item of guestCart) {
-                await api.post('/cart', { productId: item.productId, quantity: item.quantity });
+                await api.post('/cart', {
+                    productId: item.productId,
+                    productVariantId: item.productVariantId,
+                    quantity: item.quantity
+                });
             }
 
             // Clear guest cart
@@ -57,8 +61,11 @@ export const CartProvider = ({ children }) => {
     const addToCart = async (product, quantity = 1) => {
         if (isAuthenticated && user?.role === 'Customer') {
             try {
-                const response = await api.post('/cart', { productId: product.id, quantity });
-                // Re-fetch fetch all to be safe or update local state
+                const response = await api.post('/cart', {
+                    productId: product.id,
+                    productVariantId: product.variantId,
+                    quantity
+                });
                 const fetchRes = await api.get('/cart');
                 setCartItems(fetchRes.data);
                 showToast(`Đã thêm ${product.name} vào giỏ hàng`);
@@ -71,18 +78,23 @@ export const CartProvider = ({ children }) => {
         } else {
             // Guest mode
             setCartItems(prev => {
-                const existing = prev.find(item => item.productId === product.id);
+                const existing = prev.find(item =>
+                    item.productId === product.id &&
+                    item.productVariantId === product.variantId
+                );
                 let newCart;
                 if (existing) {
                     newCart = prev.map(item =>
-                        item.productId === product.id
+                        (item.productId === product.id && item.productVariantId === product.variantId)
                             ? { ...item, quantity: item.quantity + quantity }
                             : item
                     );
                 } else {
                     newCart = [...prev, {
-                        id: Date.now(), // Temp ID
+                        id: Date.now(),
                         productId: product.id,
+                        productVariantId: product.variantId,
+                        variantName: product.variantName,
                         productName: product.name,
                         price: product.price,
                         imageUrl: product.imageUrl,

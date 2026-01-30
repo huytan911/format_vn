@@ -53,6 +53,9 @@ const Cart = () => {
                                     </div>
                                     <div className="item-info">
                                         <h3>{item.productName}</h3>
+                                        {item.variantName && (
+                                            <p className="item-variant">{item.variantName}</p>
+                                        )}
                                         <button
                                             className="remove-btn"
                                             onClick={() => removeFromCart(item.id)}

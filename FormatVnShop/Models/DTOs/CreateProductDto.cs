@@ -20,4 +20,5 @@ public class CreateProductDto
     public bool IsFeatured { get; set; }
     
     public List<int> CategoryIds { get; set; } = new();
+    public List<ProductVariantDto> Variants { get; set; } = new();
 }

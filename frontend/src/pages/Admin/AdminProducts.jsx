@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
@@ -10,6 +11,7 @@ import '../../styles/admin.css';
 import { getImageUrl } from '../../utils/imageUrl';
 
 const AdminProducts = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,31 +58,11 @@ const AdminProducts = () => {
     };
 
     const handleCreate = () => {
-        setSelectedProduct(null);
-        setFormData({
-            name: '',
-            description: '',
-            price: '',
-            categoryIds: [],
-            imageUrl: '',
-            stock: '',
-            isFeatured: false
-        });
-        setIsModalOpen(true);
+        navigate('/admin/products/new');
     };
 
     const handleEdit = (product) => {
-        setSelectedProduct(product);
-        setFormData({
-            name: product.name,
-            description: product.description || '',
-            price: product.price,
-            categoryIds: product.categories ? product.categories.map(c => c.id) : [],
-            imageUrl: product.imageUrl || '',
-            stock: product.stock,
-            isFeatured: product.isFeatured
-        });
-        setIsModalOpen(true);
+        navigate(`/admin/products/edit/${product.id}`);
     };
 
     const handleDelete = (product) => {
@@ -260,96 +242,7 @@ const AdminProducts = () => {
                 onDelete={handleDelete}
             />
 
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title={selectedProduct ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}
-                size="large"
-            >
-                <form onSubmit={handleSubmit} className="admin-form">
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label>Tên sản phẩm *</label>
-                            <input
-                                type="text"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Danh mục</label>
-                            <MultiSelect
-                                options={categories}
-                                selectedIds={formData.categoryIds}
-                                onChange={(newSelectedIds) => setFormData({ ...formData, categoryIds: newSelectedIds })}
-                                placeholder="Chọn danh mục..."
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label>Giá (VNĐ) *</label>
-                            <input
-                                type="number"
-                                value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                required
-                                min="0"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Tồn kho *</label>
-                            <input
-                                type="number"
-                                value={formData.stock}
-                                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                                required
-                                min="0"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Mô tả</label>
-                        <textarea
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            rows="4"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Hình ảnh</label>
-                        <ImageUpload
-                            value={formData.imageUrl}
-                            onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-                            folder="products"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="checkbox-label">
-                            <input
-                                type="checkbox"
-                                checked={formData.isFeatured}
-                                onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                            />
-                            <span>Sản phẩm nổi bật</span>
-                        </label>
-                    </div>
-
-                    <div className="form-actions">
-                        <button type="button" className="btn-secondary" onClick={() => setIsModalOpen(false)}>
-                            Hủy
-                        </button>
-                        <button type="submit" className="btn-primary">
-                            {selectedProduct ? 'Cập nhật' : 'Tạo mới'}
-                        </button>
-                    </div>
-                </form>
-            </Modal>
+            {/* Remove product form modal */}
 
             <Modal
                 isOpen={isDeleteModalOpen}

@@ -35,15 +35,22 @@ public class CartController : ControllerBase
 
         var cartItems = await _context.CartItems
             .Include(c => c.Product)
+            .Include(c => c.ProductVariant)
             .Where(c => c.CustomerId == customer.Id)
             .Select(c => new CartItemDto
             {
                 Id = c.Id,
                 ProductId = c.ProductId,
                 ProductName = c.Product!.Name,
-                Price = c.Product.Price,
+                Price = c.ProductVariant != null && c.ProductVariant.Price.HasValue 
+                        ? c.ProductVariant.Price.Value 
+                        : c.Product.Price,
                 ImageUrl = c.Product.ImageUrl,
-                Quantity = c.Quantity
+                Quantity = c.Quantity,
+                ProductVariantId = c.ProductVariantId,
+                VariantName = c.ProductVariant != null 
+                              ? $"{c.ProductVariant.Color} / {c.ProductVariant.Size} ({c.ProductVariant.Material})" 
+                              : null
             })
             .ToListAsync();
 
@@ -60,8 +67,15 @@ public class CartController : ControllerBase
         var product = await _context.Products.FindAsync(dto.ProductId);
         if (product == null) return NotFound(new { message = "Sản phẩm không tồn tại" });
 
+        ProductVariant? variant = null;
+        if (dto.ProductVariantId.HasValue)
+        {
+            variant = await _context.ProductVariants.FindAsync(dto.ProductVariantId.Value);
+            if (variant == null) return NotFound(new { message = "Phiên bản sản phẩm không tồn tại" });
+        }
+
         var cartItem = await _context.CartItems
-            .FirstOrDefaultAsync(c => c.CustomerId == customer.Id && c.ProductId == dto.ProductId);
+            .FirstOrDefaultAsync(c => c.CustomerId == customer.Id && c.ProductId == dto.ProductId && c.ProductVariantId == dto.ProductVariantId);
 
         if (cartItem != null)
         {
@@ -73,6 +87,7 @@ public class CartController : ControllerBase
             {
                 CustomerId = customer.Id,
                 ProductId = dto.ProductId,
+                ProductVariantId = dto.ProductVariantId,
                 Quantity = dto.Quantity,
                 CreatedAt = DateTime.Now
             };
@@ -86,9 +101,11 @@ public class CartController : ControllerBase
             Id = cartItem.Id,
             ProductId = cartItem.ProductId,
             ProductName = product.Name,
-            Price = product.Price,
+            Price = variant != null && variant.Price.HasValue ? variant.Price.Value : product.Price,
             ImageUrl = product.ImageUrl,
-            Quantity = cartItem.Quantity
+            Quantity = cartItem.Quantity,
+            ProductVariantId = cartItem.ProductVariantId,
+            VariantName = variant != null ? $"{variant.Color} / {variant.Size} ({variant.Material})" : null
         });
     }
 

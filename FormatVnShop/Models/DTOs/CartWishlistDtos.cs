@@ -8,12 +8,15 @@ public class CartItemDto
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
     public int Quantity { get; set; }
+    public int? ProductVariantId { get; set; }
+    public string? VariantName { get; set; }
     public decimal TotalPrice => Price * Quantity;
 }
 
 public class AddCartItemDto
 {
     public int ProductId { get; set; }
+    public int? ProductVariantId { get; set; }
     public int Quantity { get; set; } = 1;
 }
 
