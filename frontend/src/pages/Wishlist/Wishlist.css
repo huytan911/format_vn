@@ -1,0 +1,128 @@
+.wishlist-page {
+    padding: 60px 0;
+    min-height: calc(100vh - 400px);
+    background-color: #ffffff;
+}
+
+.wishlist-page.loading,
+.wishlist-page.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.wishlist-page.empty h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.wishlist-item {
+    border: 1px solid #eee;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wishlist-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.wishlist-item .item-image {
+    position: relative;
+    height: 350px;
+    overflow: hidden;
+}
+
+.wishlist-item .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-wishlist-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #fff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    color: #ce3131;
+    transition: all 0.2s ease;
+}
+
+.remove-wishlist-btn:hover {
+    background-color: #ce3131;
+    color: #fff;
+}
+
+.wishlist-item .item-info {
+    padding: 20px;
+    text-align: center;
+}
+
+.wishlist-item .item-info h3 {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    height: 40px;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.wishlist-item .item-price {
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 15px;
+}
+
+.item-status {
+    margin-bottom: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.stock-in {
+    color: #2e7d32;
+}
+
+.stock-out {
+    color: #d32f2f;
+}
+
+.add-to-cart-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+}
+
+.wishlist-footer {
+    margin-top: 50px;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+}
+
+.wishlist-footer .back-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}

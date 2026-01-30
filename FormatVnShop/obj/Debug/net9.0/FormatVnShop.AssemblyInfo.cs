@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FormatVnShop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+412451cb775751ef6055ce9362366fa867721d8c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+43b28041bf67839b1fcdb79822a782a237ce91d3")]
 [assembly: System.Reflection.AssemblyProductAttribute("FormatVnShop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FormatVnShop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { productsAPI } from '../../services/api';
 import { FiShoppingBag, FiHeart } from 'react-icons/fi';
+import { useCart } from '../../contexts/CartContext';
+import { useWishlist } from '../../contexts/WishlistContext';
+import { getImageUrl } from '../../utils/imageUrl';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -9,6 +12,8 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
+    const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -54,7 +59,7 @@ const ProductDetail = () => {
                     <div className="product-images">
                         <div className="main-image">
                             <img
-                                src={product.imageUrl || 'https://via.placeholder.com/600x800?text=Format'}
+                                src={getImageUrl(product.imageUrl)}
                                 alt={product.name}
                             />
                         </div>
@@ -99,11 +104,19 @@ const ProductDetail = () => {
                         </div>
 
                         <div className="product-actions">
-                            <button className="btn btn-primary add-to-cart">
+                            <button
+                                className="btn btn-primary add-to-cart"
+                                onClick={() => addToCart(product, quantity)}
+                                disabled={product.stock <= 0}
+                            >
                                 <FiShoppingBag /> Thêm vào giỏ hàng
                             </button>
-                            <button className="btn wishlist-btn">
-                                <FiHeart /> Yêu thích
+                            <button
+                                className={`btn wishlist-detail-btn ${isInWishlist(product.id) ? 'active' : ''}`}
+                                onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product.id)}
+                            >
+                                <FiHeart fill={isInWishlist(product.id) ? "currentColor" : "none"} />
+                                {isInWishlist(product.id) ? ' Đã yêu thích' : ' Yêu thích'}
                             </button>
                         </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './login.css';
 
@@ -17,7 +17,7 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-            const result = await login(email, password);
+            const result = await login(email, password, true);
             if (result.success) {
                 navigate('/admin/products');
             } else {
@@ -32,6 +32,7 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            <Link to="/" className="back-home-link">← Quay lại trang chủ</Link>
             <div className="login-card">
                 <div className="login-header">
                     <h1>FORMAT.VN</h1>

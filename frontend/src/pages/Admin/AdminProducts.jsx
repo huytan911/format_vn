@@ -4,7 +4,10 @@ import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
 import MultiSelect from '../../components/MultiSelect/MultiSelect';
+import ImageUpload from '../../components/ImageUpload/ImageUpload';
 import '../../styles/admin.css';
+
+import { getImageUrl } from '../../utils/imageUrl';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -22,6 +25,11 @@ const AdminProducts = () => {
         imageUrl: '',
         stock: '',
         isFeatured: false
+    });
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        message: '',
+        type: 'success' // 'success' | 'error'
     });
 
     useEffect(() => {
@@ -80,6 +88,14 @@ const AdminProducts = () => {
         setIsDeleteModalOpen(true);
     };
 
+    const showNotification = (message, type = 'success') => {
+        setNotification({
+            isOpen: true,
+            message,
+            type
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -93,15 +109,17 @@ const AdminProducts = () => {
 
             if (selectedProduct) {
                 await api.put(`/products/${selectedProduct.id}`, data);
+                showNotification('Cập nhật sản phẩm thành công!');
             } else {
                 await api.post('/products', data);
+                showNotification('Thêm sản phẩm mới thành công!');
             }
 
             setIsModalOpen(false);
             fetchProducts();
         } catch (error) {
             console.error('Error saving product:', error);
-            alert('Lỗi khi lưu sản phẩm');
+            showNotification('Lỗi khi lưu sản phẩm: ' + (error.response?.data?.message || error.message), 'error');
         }
     };
 
@@ -110,9 +128,10 @@ const AdminProducts = () => {
             await api.delete(`/products/${selectedProduct.id}`);
             setIsDeleteModalOpen(false);
             fetchProducts();
+            showNotification('Xóa sản phẩm thành công!');
         } catch (error) {
             console.error('Error deleting product:', error);
-            alert('Lỗi khi xóa sản phẩm');
+            showNotification('Lỗi khi xóa sản phẩm: ' + (error.response?.data?.message || error.message), 'error');
         }
     };
 
@@ -164,6 +183,17 @@ const AdminProducts = () => {
     };
 
     const columns = [
+        {
+            header: 'Ảnh',
+            accessor: 'imageUrl',
+            render: (item) => (
+                <img
+                    src={getImageUrl(item.imageUrl)}
+                    alt={item.name}
+                    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                />
+            )
+        },
         { header: 'ID', accessor: 'id', sortable: true },
         { header: 'Tên sản phẩm', accessor: 'name', sortable: true },
         {
@@ -291,12 +321,11 @@ const AdminProducts = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>URL hình ảnh</label>
-                        <input
-                            type="url"
+                        <label>Hình ảnh</label>
+                        <ImageUpload
                             value={formData.imageUrl}
-                            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                            placeholder="https://example.com/image.jpg"
+                            onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                            folder="products"
                         />
                     </div>
 
@@ -363,6 +392,29 @@ const AdminProducts = () => {
                             onClick={confirmRemoveCategory}
                         >
                             Xóa
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Notification Modal */}
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Thông báo lỗi'}
+                size="small"
+            >
+                <div className="notification-content">
+                    <div className={`notification-icon ${notification.type}`}>
+                        {notification.type === 'success' ? '✅' : '❌'}
+                    </div>
+                    <p>{notification.message}</p>
+                    <div className="form-actions" style={{ justifyContent: 'center', marginTop: '20px' }}>
+                        <button
+                            className={`btn-${notification.type === 'success' ? 'primary' : 'danger'}`}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
                         </button>
                     </div>
                 </div>

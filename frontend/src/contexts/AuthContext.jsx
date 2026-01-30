@@ -18,23 +18,22 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (email, password, isAdmin = false) => {
         try {
-            const response = await api.post('/auth/login', { email, password });
+            const endpoint = isAdmin ? '/auth/login' : '/auth/customer/login';
+            const response = await api.post(endpoint, { email, password });
             const { token, ...userData } = response.data;
 
             localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify({
-                username: userData.username,
-                email: userData.email,
-                role: userData.role
-            }));
 
-            setUser({
-                username: userData.username,
+            const userObj = {
+                name: userData.username || userData.name,
                 email: userData.email,
                 role: userData.role
-            });
+            };
+
+            localStorage.setItem('user', JSON.stringify(userObj));
+            setUser(userObj);
 
             return { success: true };
         } catch (error) {
@@ -46,15 +45,48 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const register = async (registerData) => {
+        try {
+            const response = await api.post('/auth/customer/register', registerData);
+            const { token, ...userData } = response.data;
+
+            localStorage.setItem('token', token);
+
+            const userObj = {
+                name: userData.name,
+                email: userData.email,
+                role: userData.role
+            };
+
+            localStorage.setItem('user', JSON.stringify(userObj));
+            setUser(userObj);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Registration error:', error);
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.'
+            };
+        }
+    };
+
     const logout = () => {
+        const role = user?.role;
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
-        window.location.href = '/login';
+
+        // Use window.location.href to fully reset the application state on logout
+        if (role === 'Customer') {
+            window.location.href = '/';
+        } else {
+            window.location.href = '/login';
+        }
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, login, register, logout, loading, isAuthenticated: !!user, isAdmin: user?.role !== 'Customer' && !!user }}>
             {!loading && children}
         </AuthContext.Provider>
     );

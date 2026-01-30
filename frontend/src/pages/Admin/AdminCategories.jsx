@@ -3,7 +3,9 @@ import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
-import '../../styles/admin.css';
+import ImageUpload from '../../components/ImageUpload/ImageUpload';
+
+import { getImageUrl } from '../../utils/imageUrl';
 
 const AdminCategories = () => {
     const [categories, setCategories] = useState([]);
@@ -104,6 +106,17 @@ const AdminCategories = () => {
     };
 
     const columns = [
+        {
+            header: 'Ảnh',
+            accessor: 'imageUrl',
+            render: (item) => (
+                <img
+                    src={getImageUrl(item.imageUrl)}
+                    alt={item.name}
+                    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                />
+            )
+        },
         { header: 'ID', accessor: 'id', sortable: true },
         { header: 'Tên danh mục', accessor: 'name', sortable: true },
         {
@@ -194,12 +207,11 @@ const AdminCategories = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>URL hình ảnh</label>
-                        <input
-                            type="url"
+                        <label>Hình ảnh</label>
+                        <ImageUpload
                             value={formData.imageUrl}
-                            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                            placeholder="https://example.com/image.jpg"
+                            onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                            folder="categories"
                         />
                     </div>
 

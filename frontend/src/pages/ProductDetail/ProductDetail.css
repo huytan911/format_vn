@@ -144,12 +144,34 @@
     padding: 1rem 2rem;
 }
 
-.wishlist-btn {
+.wishlist-detail-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     padding: 1rem 1.5rem;
+    background-color: transparent;
+    border: 2px solid var(--color-black);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wishlist-detail-btn:hover {
+    background-color: var(--color-gray-light);
+}
+
+.wishlist-detail-btn.active {
+    color: #ce3131;
+    border-color: #ce3131;
+}
+
+.wishlist-detail-btn svg {
+    transition: transform 0.2s ease;
+}
+
+.wishlist-detail-btn:active svg {
+    transform: scale(1.2);
 }
 
 .product-meta {

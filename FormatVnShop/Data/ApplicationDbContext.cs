@@ -38,6 +38,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<AdminUser> AdminUsers { get; set; }
+    public DbSet<CartItem> CartItems { get; set; }
+    public DbSet<WishlistItem> WishlistItems { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +58,11 @@ public class ApplicationDbContext : DbContext
             .HasOne(pc => pc.Category)
             .WithMany(c => c.ProductCategories)
             .HasForeignKey(pc => pc.CategoryId);
+        
+        // Configure Customer
+        modelBuilder.Entity<Customer>()
+            .HasIndex(c => c.Email)
+            .IsUnique();
         
         // Configure Category Hierarchy
         modelBuilder.Entity<Category>()
@@ -193,6 +200,7 @@ public class ApplicationDbContext : DbContext
                 Id = 1,
                 Name = "Nguyễn Văn An",
                 Email = "nguyenvanan@gmail.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@123"),
                 Phone = "0901234567",
                 Address = "123 Nguyễn Huệ, Q1, TP.HCM",
                 CreatedAt = DateTime.Now.AddMonths(-6)
@@ -202,6 +210,7 @@ public class ApplicationDbContext : DbContext
                 Id = 2,
                 Name = "Trần Thị Bình",
                 Email = "tranthibinh@gmail.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@123"),
                 Phone = "0912345678",
                 Address = "456 Lê Lợi, Q3, TP.HCM",
                 CreatedAt = DateTime.Now.AddMonths(-4)
@@ -211,6 +220,7 @@ public class ApplicationDbContext : DbContext
                 Id = 3,
                 Name = "Lê Minh Cường",
                 Email = "leminhcuong@gmail.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@123"),
                 Phone = "0923456789",
                 Address = "789 Trần Hưng Đạo, Q5, TP.HCM",
                 CreatedAt = DateTime.Now.AddMonths(-3)
@@ -220,6 +230,7 @@ public class ApplicationDbContext : DbContext
                 Id = 4,
                 Name = "Phạm Thu Dung",
                 Email = "phamthudung@gmail.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@123"),
                 Phone = "0934567890",
                 Address = "321 Võ Văn Tần, Q10, TP.HCM",
                 CreatedAt = DateTime.Now.AddMonths(-2)
@@ -229,6 +240,7 @@ public class ApplicationDbContext : DbContext
                 Id = 5,
                 Name = "Hoàng Quốc Việt",
                 Email = "hoangquocviet@gmail.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@123"),
                 Phone = "0945678901",
                 Address = "654 Hai Bà Trưng, Q1, Hà Nội",
                 CreatedAt = DateTime.Now.AddMonths(-1)
