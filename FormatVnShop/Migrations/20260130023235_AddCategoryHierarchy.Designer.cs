@@ -3,6 +3,7 @@ using System;
 using FormatVnShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormatVnShop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260130023235_AddCategoryHierarchy")]
+    partial class AddCategoryHierarchy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +48,6 @@ namespace FormatVnShop.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -60,34 +60,31 @@ namespace FormatVnShop.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 7, 30, 9, 45, 32, 331, DateTimeKind.Local).AddTicks(86),
+                            CreatedAt = new DateTime(2025, 7, 30, 9, 32, 34, 348, DateTimeKind.Local).AddTicks(9521),
                             Email = "admin@format.vn",
                             IsActive = true,
-                            PasswordHash = "$2a$11$TJl58ocVb0LAXOQb0uJVl.X5hTQbed5WYnr3MZbiRb1y2LQk8Ayau",
+                            PasswordHash = "$2a$11$hLVyLBh74WWxxAoazuVJveiBYsUw906sD2tO.ayu5nyyb64Bndj8i",
                             Role = 0,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7560),
                             Username = "admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 10, 30, 9, 45, 32, 509, DateTimeKind.Local).AddTicks(9241),
+                            CreatedAt = new DateTime(2025, 10, 30, 9, 32, 34, 517, DateTimeKind.Local).AddTicks(5032),
                             Email = "manager@format.vn",
                             IsActive = true,
-                            PasswordHash = "$2a$11$khqbbC5jHfr5.F3AwPYaXeMS2cMqwRES.uzBSKnArJpCFUztUzYiq",
+                            PasswordHash = "$2a$11$G1A6FwiRhIjwTh4GIWAT1eHNHB0tuGWasnVr3zL1DiiKNUUzZu6CS",
                             Role = 1,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 331, DateTimeKind.Local).AddTicks(329),
                             Username = "manager"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 12, 30, 9, 45, 32, 679, DateTimeKind.Local).AddTicks(5254),
+                            CreatedAt = new DateTime(2025, 12, 30, 9, 32, 34, 685, DateTimeKind.Local).AddTicks(5475),
                             Email = "staff@format.vn",
                             IsActive = true,
-                            PasswordHash = "$2a$11$qXZ6Yx2DM9bBgmA4jl9CNeRFWn0tHSDYwRqaRWsQqhAg4x6wKEuPe",
+                            PasswordHash = "$2a$11$L3dxYyMWqHwIlfRwPF5W.OwBOps0LchVwjNKLfobchsP2XSZ2k4Fq",
                             Role = 2,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 509, DateTimeKind.Local).AddTicks(9289),
                             Username = "staff"
                         });
                 });
@@ -97,9 +94,6 @@ namespace FormatVnShop.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
@@ -114,9 +108,6 @@ namespace FormatVnShop.Migrations
                     b.Property<int?>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
@@ -127,29 +118,23 @@ namespace FormatVnShop.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6342),
                             Description = "Thời trang nữ",
                             ImageUrl = "/images/categories/nu.jpg",
-                            Name = "NỮ",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6376)
+                            Name = "NỮ"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6383),
                             Description = "Thời trang nam",
                             ImageUrl = "/images/categories/nam.jpg",
-                            Name = "NAM",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6385)
+                            Name = "NAM"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6389),
                             Description = "Phụ kiện thời trang",
                             ImageUrl = "/images/categories/phukien.jpg",
-                            Name = "PHỤ KIỆN",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6391)
+                            Name = "PHỤ KIỆN"
                         });
                 });
 
@@ -176,9 +161,6 @@ namespace FormatVnShop.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
@@ -188,51 +170,46 @@ namespace FormatVnShop.Migrations
                         {
                             Id = 1,
                             Address = "123 Nguyễn Huệ, Q1, TP.HCM",
-                            CreatedAt = new DateTime(2025, 7, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7083),
+                            CreatedAt = new DateTime(2025, 7, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(878),
                             Email = "nguyenvanan@gmail.com",
                             Name = "Nguyễn Văn An",
-                            Phone = "0901234567",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7078)
+                            Phone = "0901234567"
                         },
                         new
                         {
                             Id = 2,
                             Address = "456 Lê Lợi, Q3, TP.HCM",
-                            CreatedAt = new DateTime(2025, 9, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7101),
+                            CreatedAt = new DateTime(2025, 9, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(893),
                             Email = "tranthibinh@gmail.com",
                             Name = "Trần Thị Bình",
-                            Phone = "0912345678",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7097)
+                            Phone = "0912345678"
                         },
                         new
                         {
                             Id = 3,
                             Address = "789 Trần Hưng Đạo, Q5, TP.HCM",
-                            CreatedAt = new DateTime(2025, 10, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7112),
+                            CreatedAt = new DateTime(2025, 10, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(895),
                             Email = "leminhcuong@gmail.com",
                             Name = "Lê Minh Cường",
-                            Phone = "0923456789",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7107)
+                            Phone = "0923456789"
                         },
                         new
                         {
                             Id = 4,
                             Address = "321 Võ Văn Tần, Q10, TP.HCM",
-                            CreatedAt = new DateTime(2025, 11, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7121),
+                            CreatedAt = new DateTime(2025, 11, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(898),
                             Email = "phamthudung@gmail.com",
                             Name = "Phạm Thu Dung",
-                            Phone = "0934567890",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7118)
+                            Phone = "0934567890"
                         },
                         new
                         {
                             Id = 5,
                             Address = "654 Hai Bà Trưng, Q1, Hà Nội",
-                            CreatedAt = new DateTime(2025, 12, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7131),
+                            CreatedAt = new DateTime(2025, 12, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(921),
                             Email = "hoangquocviet@gmail.com",
                             Name = "Hoàng Quốc Việt",
-                            Phone = "0945678901",
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7127)
+                            Phone = "0945678901"
                         });
                 });
 
@@ -241,9 +218,6 @@ namespace FormatVnShop.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
@@ -265,9 +239,6 @@ namespace FormatVnShop.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -278,74 +249,62 @@ namespace FormatVnShop.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7223),
                             CustomerId = 1,
-                            OrderDate = new DateTime(2025, 12, 31, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7230),
+                            OrderDate = new DateTime(2025, 12, 31, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(991),
                             OrderNumber = "ORD-2026-0001",
                             ShippingAddress = "123 Nguyễn Huệ, Q1, TP.HCM",
                             Status = "Delivered",
-                            TotalAmount = 3117000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7226)
+                            TotalAmount = 3117000m
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7250),
                             CustomerId = 2,
-                            OrderDate = new DateTime(2026, 1, 10, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7257),
+                            OrderDate = new DateTime(2026, 1, 10, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(1002),
                             OrderNumber = "ORD-2026-0002",
                             ShippingAddress = "456 Lê Lợi, Q3, TP.HCM",
                             Status = "Delivered",
-                            TotalAmount = 2580000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7254)
+                            TotalAmount = 2580000m
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7262),
                             CustomerId = 3,
-                            OrderDate = new DateTime(2026, 1, 15, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7267),
+                            OrderDate = new DateTime(2026, 1, 15, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(1006),
                             OrderNumber = "ORD-2026-0003",
                             ShippingAddress = "789 Trần Hưng Đạo, Q5, TP.HCM",
                             Status = "Shipped",
-                            TotalAmount = 1827000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7264)
+                            TotalAmount = 1827000m
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7272),
                             CustomerId = 4,
-                            OrderDate = new DateTime(2026, 1, 20, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7278),
+                            OrderDate = new DateTime(2026, 1, 20, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(1011),
                             OrderNumber = "ORD-2026-0004",
                             ShippingAddress = "321 Võ Văn Tần, Q10, TP.HCM",
                             Status = "Processing",
-                            TotalAmount = 4320000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7275)
+                            TotalAmount = 4320000m
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7283),
                             CustomerId = 5,
-                            OrderDate = new DateTime(2026, 1, 25, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7288),
+                            OrderDate = new DateTime(2026, 1, 25, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(1014),
                             OrderNumber = "ORD-2026-0005",
                             ShippingAddress = "654 Hai Bà Trưng, Q1, Hà Nội",
                             Status = "Pending",
-                            TotalAmount = 1014000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7285)
+                            TotalAmount = 1014000m
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7293),
                             CustomerId = 1,
-                            OrderDate = new DateTime(2026, 1, 28, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7299),
+                            OrderDate = new DateTime(2026, 1, 28, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(1018),
                             OrderNumber = "ORD-2026-0006",
                             ShippingAddress = "123 Nguyễn Huệ, Q1, TP.HCM",
                             Status = "Pending",
-                            TotalAmount = 1590000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7296)
+                            TotalAmount = 1590000m
                         });
                 });
 
@@ -354,9 +313,6 @@ namespace FormatVnShop.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -370,9 +326,6 @@ namespace FormatVnShop.Migrations
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
@@ -385,82 +338,66 @@ namespace FormatVnShop.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7397),
                             OrderId = 1,
                             ProductId = 1,
                             Quantity = 1,
-                            UnitPrice = 1827000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7401)
+                            UnitPrice = 1827000m
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7406),
                             OrderId = 1,
                             ProductId = 2,
                             Quantity = 1,
-                            UnitPrice = 1290000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7409)
+                            UnitPrice = 1290000m
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7413),
                             OrderId = 2,
                             ProductId = 3,
                             Quantity = 2,
-                            UnitPrice = 1290000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7415)
+                            UnitPrice = 1290000m
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7419),
                             OrderId = 3,
                             ProductId = 1,
                             Quantity = 1,
-                            UnitPrice = 1827000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7421)
+                            UnitPrice = 1827000m
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7425),
                             OrderId = 4,
                             ProductId = 6,
                             Quantity = 1,
-                            UnitPrice = 3570000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7427)
+                            UnitPrice = 3570000m
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7431),
                             OrderId = 4,
                             ProductId = 7,
                             Quantity = 1,
-                            UnitPrice = 750000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7434)
+                            UnitPrice = 750000m
                         },
                         new
                         {
                             Id = 7,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7437),
                             OrderId = 5,
                             ProductId = 5,
                             Quantity = 1,
-                            UnitPrice = 1014000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7440)
+                            UnitPrice = 1014000m
                         },
                         new
                         {
                             Id = 8,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7459),
                             OrderId = 6,
                             ProductId = 4,
                             Quantity = 1,
-                            UnitPrice = 1590000m,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(7461)
+                            UnitPrice = 1590000m
                         });
                 });
 
@@ -492,9 +429,6 @@ namespace FormatVnShop.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Products");
@@ -503,98 +437,90 @@ namespace FormatVnShop.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6759),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(696),
                             Description = "Masterpiece by FORMAT. Kỹ thuật khâu tay thủ công tỉ mỉ, chất liệu dạ ấm áp (80% wool). Dáng suông dài, cổ hai ve.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10000752.jpg",
                             IsFeatured = true,
                             Name = "Áo măng tô dạ khâu tay dây lưng rời",
                             Price = 1827000m,
-                            Stock = 15,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6722)
+                            Stock = 15
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6771),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(730),
                             Description = "Quần ống suông chất liệu dạ cao cấp, đi kèm dây lưng rời. Phong cách lịch lãm cho phái nữ.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10005601.jpg",
                             IsFeatured = true,
                             Name = "Quần ống suông dạ dây lưng rời",
                             Price = 1290000m,
-                            Stock = 25,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6766)
+                            Stock = 25
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6781),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(734),
                             Description = "Thiết kế 2 lớp dày dặn, không cổ trẻ trung. Chất liệu dạ mịn, giữ ấm tốt.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10005588.jpg",
                             IsFeatured = false,
                             Name = "Áo Gile dạ 2 lớp không cổ",
                             Price = 1290000m,
-                            Stock = 30,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6776)
+                            Stock = 30
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6790),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(737),
                             Description = "Chân váy dạ 2 lớp, thiết kế cạp chun thoải mái, lịch sự cho công sở.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10005515.jpg",
                             IsFeatured = true,
                             Name = "Chân váy dạ 2 lớp cạp liền chun",
                             Price = 1590000m,
-                            Stock = 20,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6786)
+                            Stock = 20
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6804),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(740),
                             Description = "Công nghệ không đường may hiện đại, chất liệu cotton cao cấp, thoáng khí và bền màu.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10005496.jpg",
                             IsFeatured = true,
                             Name = "Áo polo nam không đường may cổ đức",
                             Price = 1014000m,
-                            Stock = 40,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6800)
+                            Stock = 40
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6856),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(744),
                             Description = "Áo khoác nam thiết kế sang trọng, chất liệu cao cấp, giữ ấm hiệu quả cho mùa đông.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10005390.jpg",
                             IsFeatured = false,
                             Name = "Áo khoác tay dài nam",
                             Price = 3570000m,
-                            Stock = 35,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6816)
+                            Stock = 35
                         },
                         new
                         {
                             Id = 7,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6865),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(747),
                             Description = "Quần nỉ nam năng động, cạp chun có dây rút, phù hợp cho phong cách thể thao/dạo phố.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10004947.jpg",
                             IsFeatured = true,
                             Name = "Quần ống bó nỉ cạp chun luồn dây",
                             Price = 750000m,
-                            Stock = 18,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6861)
+                            Stock = 18
                         },
                         new
                         {
                             Id = 8,
-                            CreatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6875),
+                            CreatedAt = new DateTime(2026, 1, 30, 9, 32, 34, 182, DateTimeKind.Local).AddTicks(750),
                             Description = "Công nghệ giữ nhiệt WarmMax độc quyền, mỏng nhẹ, giữ ấm cơ thể tối ưu.",
                             ImageUrl = "https://format.vn/media/catalog/product/1/0/10000183.jpg",
                             IsFeatured = true,
                             Name = "Áo giữ nhiệt WarmMax Light cổ tròn",
                             Price = 245000m,
-                            Stock = 12,
-                            UpdatedAt = new DateTime(2026, 1, 30, 9, 45, 32, 160, DateTimeKind.Local).AddTicks(6872)
+                            Stock = 12
                         });
                 });
 

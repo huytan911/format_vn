@@ -10,6 +10,7 @@ public class ProductDto
     public int Stock { get; set; }
     public bool IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public List<CategoryDto> Categories { get; set; } = new();
 }
 
@@ -18,4 +19,6 @@ public class CategoryDto
     public int Id { get; set; }
     public required string Name { get; set; }
     public string? ImageUrl { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

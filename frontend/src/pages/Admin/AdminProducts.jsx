@@ -205,6 +205,12 @@ const AdminProducts = () => {
                     {item.isFeatured ? '⭐ Có' : 'Không'}
                 </span>
             )
+        },
+        {
+            header: 'Ngày tạo',
+            accessor: 'createdAt',
+            sortable: true,
+            render: (item) => new Date(item.createdAt).toLocaleString('vi-VN')
         }
     ];
 

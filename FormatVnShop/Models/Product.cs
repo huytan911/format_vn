@@ -1,6 +1,6 @@
 namespace FormatVnShop.Models;
 
-public class Product
+public class Product : BaseEntity
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -9,7 +9,6 @@ public class Product
     public string? ImageUrl { get; set; }
     public int Stock { get; set; }
     public bool IsFeatured { get; set; }
-    public DateTime CreatedAt { get; set; }
     
     // Navigation property
     public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
@@ -10,13 +10,17 @@ const AdminCategories = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        message: '',
+        type: 'success' // 'success' | 'error'
+    });
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        imageUrl: ''
+        imageUrl: '',
+        parentId: ''
     });
-
-    const API_URL = 'http://localhost:5149/api';
 
     useEffect(() => {
         fetchCategories();
@@ -24,7 +28,7 @@ const AdminCategories = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`${API_URL}/categories`);
+            const response = await api.get('/categories');
             setCategories(response.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -33,7 +37,7 @@ const AdminCategories = () => {
 
     const handleCreate = () => {
         setSelectedCategory(null);
-        setFormData({ name: '', description: '', imageUrl: '' });
+        setFormData({ name: '', description: '', imageUrl: '', parentId: '' });
         setIsModalOpen(true);
     };
 
@@ -42,7 +46,8 @@ const AdminCategories = () => {
         setFormData({
             name: category.name,
             description: category.description || '',
-            imageUrl: category.imageUrl || ''
+            imageUrl: category.imageUrl || '',
+            parentId: category.parentId || ''
         });
         setIsModalOpen(true);
     };
@@ -52,46 +57,81 @@ const AdminCategories = () => {
         setIsDeleteModalOpen(true);
     };
 
+    const showNotification = (message, type = 'success') => {
+        setNotification({
+            isOpen: true,
+            message,
+            type
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const dataToSave = {
+                ...formData,
+                parentId: formData.parentId === '' ? null : parseInt(formData.parentId)
+            };
+
             if (selectedCategory) {
-                await axios.put(`${API_URL}/categories/${selectedCategory.id}`, {
-                    ...formData,
+                await api.put(`/categories/${selectedCategory.id}`, {
+                    ...dataToSave,
                     id: selectedCategory.id
                 });
+                showNotification('Cập nhật danh mục thành công!');
             } else {
-                await axios.post(`${API_URL}/categories`, formData);
+                await api.post('/categories', dataToSave);
+                showNotification('Thêm danh mục mới thành công!');
             }
             setIsModalOpen(false);
             fetchCategories();
         } catch (error) {
             console.error('Error saving category:', error);
-            alert('Lỗi khi lưu danh mục');
+            showNotification('Lỗi khi lưu danh mục: ' + (error.response?.data || error.message), 'error');
         }
     };
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`${API_URL}/categories/${selectedCategory.id}`);
+            await api.delete(`/categories/${selectedCategory.id}`);
             setIsDeleteModalOpen(false);
             fetchCategories();
+            showNotification('Xóa danh mục thành công!');
         } catch (error) {
             console.error('Error deleting category:', error);
-            alert('Lỗi khi xóa danh mục. Có thể danh mục đang có sản phẩm.');
+            showNotification('Lỗi khi xóa danh mục. Có thể danh mục đang có sản phẩm hoặc danh mục con.', 'error');
         }
     };
 
     const columns = [
         { header: 'ID', accessor: 'id', sortable: true },
         { header: 'Tên danh mục', accessor: 'name', sortable: true },
+        {
+            header: 'Danh mục cha',
+            accessor: 'parent.name',
+            render: (item) => item.parent ? (
+                <span className="badge badge-info">{item.parent.name}</span>
+            ) : (
+                <span className="text-gray">-</span>
+            )
+        },
+        {
+            header: 'Ngày tạo',
+            accessor: 'createdAt',
+            sortable: true,
+            render: (item) => new Date(item.createdAt).toLocaleString('vi-VN')
+        },
         { header: 'Mô tả', accessor: 'description' },
         {
             header: 'Số sản phẩm',
-            accessor: 'products',
-            render: (item) => item.products?.length || 0
+            accessor: 'productCategories',
+            render: (item) => item.productCategories?.length || 0
         }
     ];
+
+    // Filter out the current category and its children (to avoid circular refs)
+    // For simplicity, we just filter out the current category for now
+    const parentOptions = categories.filter(c => !selectedCategory || c.id !== selectedCategory.id);
 
     return (
         <AdminLayout>
@@ -113,16 +153,35 @@ const AdminCategories = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={selectedCategory ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
+                size="large"
             >
                 <form onSubmit={handleSubmit} className="admin-form">
-                    <div className="form-group">
-                        <label>Tên danh mục *</label>
-                        <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            required
-                        />
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>Tên danh mục *</label>
+                            <input
+                                type="text"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Danh mục cha</label>
+                            <select
+                                value={formData.parentId}
+                                onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
+                                className="form-control"
+                            >
+                                <option value="">-- Không có (Danh mục gốc) --</option>
+                                {parentOptions.map(cat => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="form-group">
@@ -169,6 +228,29 @@ const AdminCategories = () => {
                         </button>
                         <button className="btn-danger" onClick={confirmDelete}>
                             Xóa
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Notification Modal */}
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Thông báo lỗi'}
+                size="small"
+            >
+                <div className="notification-content">
+                    <div className={`notification-icon ${notification.type}`}>
+                        {notification.type === 'success' ? '✅' : '❌'}
+                    </div>
+                    <p>{notification.message}</p>
+                    <div className="form-actions" style={{ justifyContent: 'center', marginTop: '20px' }}>
+                        <button
+                            className={`btn-${notification.type === 'success' ? 'primary' : 'danger'}`}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
                         </button>
                     </div>
                 </div>

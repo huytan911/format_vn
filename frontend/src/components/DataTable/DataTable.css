@@ -95,9 +95,32 @@
     color: #81d4fa;
 }
 
+.th-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .sort-icon {
     font-size: 10px;
-    margin-left: 5px;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    visibility: hidden;
+    opacity: 0.3;
+}
+
+.data-table thead th.sortable:hover .sort-icon {
+    visibility: visible;
+}
+
+.sort-icon.visible {
+    visibility: visible;
+    opacity: 1;
+    color: #81d4fa;
 }
 
 .data-table tbody tr {

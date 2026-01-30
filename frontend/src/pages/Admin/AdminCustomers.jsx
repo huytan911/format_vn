@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
@@ -17,15 +17,13 @@ const AdminCustomers = () => {
         address: ''
     });
 
-    const API_URL = 'http://localhost:5149/api';
-
     useEffect(() => {
         fetchCustomers();
     }, []);
 
     const fetchCustomers = async () => {
         try {
-            const response = await axios.get(`${API_URL}/customers`);
+            const response = await api.get('/customers');
             setCustomers(response.data);
         } catch (error) {
             console.error('Error fetching customers:', error);
@@ -58,17 +56,16 @@ const AdminCustomers = () => {
         e.preventDefault();
         try {
             const data = {
-                ...formData,
-                createdAt: selectedCustomer ? selectedCustomer.createdAt : new Date().toISOString()
+                ...formData
             };
 
             if (selectedCustomer) {
-                await axios.put(`${API_URL}/customers/${selectedCustomer.id}`, {
+                await api.put(`/customers/${selectedCustomer.id}`, {
                     ...data,
                     id: selectedCustomer.id
                 });
             } else {
-                await axios.post(`${API_URL}/customers`, data);
+                await api.post('/customers', data);
             }
             setIsModalOpen(false);
             fetchCustomers();
@@ -80,7 +77,7 @@ const AdminCustomers = () => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`${API_URL}/customers/${selectedCustomer.id}`);
+            await api.delete(`/customers/${selectedCustomer.id}`);
             setIsDeleteModalOpen(false);
             fetchCustomers();
         } catch (error) {
@@ -95,6 +92,12 @@ const AdminCustomers = () => {
         { header: 'Email', accessor: 'email', sortable: true },
         { header: 'Số điện thoại', accessor: 'phone' },
         { header: 'Địa chỉ', accessor: 'address' },
+        {
+            header: 'Ngày tạo',
+            accessor: 'createdAt',
+            sortable: true,
+            render: (item) => new Date(item.createdAt).toLocaleString('vi-VN')
+        },
         {
             header: 'Số đơn hàng',
             accessor: 'orders',

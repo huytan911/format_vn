@@ -9,6 +9,27 @@ public class ApplicationDbContext : DbContext
         : base(options)
     {
     }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e.Entity is BaseEntity && (
+                    e.State == EntityState.Added
+                    || e.State == EntityState.Modified));
+
+        foreach (var entityEntry in entries)
+        {
+            ((BaseEntity)entityEntry.Entity).UpdatedAt = DateTime.Now;
+
+            if (entityEntry.State == EntityState.Added)
+            {
+                ((BaseEntity)entityEntry.Entity).CreatedAt = DateTime.Now;
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
+    }
     
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -35,6 +56,13 @@ public class ApplicationDbContext : DbContext
             .HasOne(pc => pc.Category)
             .WithMany(c => c.ProductCategories)
             .HasForeignKey(pc => pc.CategoryId);
+        
+        // Configure Category Hierarchy
+        modelBuilder.Entity<Category>()
+            .HasOne(c => c.Parent)
+            .WithMany(c => c.Children)
+            .HasForeignKey(c => c.ParentId)
+            .OnDelete(DeleteBehavior.Restrict);
         
         // Seed Categories
         modelBuilder.Entity<Category>().HasData(

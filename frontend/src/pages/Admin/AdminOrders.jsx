@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
@@ -20,8 +20,6 @@ const AdminOrders = () => {
         orderItems: []
     });
 
-    const API_URL = 'http://localhost:5149/api';
-
     const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
     useEffect(() => {
@@ -32,7 +30,7 @@ const AdminOrders = () => {
 
     const fetchOrders = async () => {
         try {
-            const response = await axios.get(`${API_URL}/orders`);
+            const response = await api.get('/orders');
             setOrders(response.data);
         } catch (error) {
             console.error('Error fetching orders:', error);
@@ -41,7 +39,7 @@ const AdminOrders = () => {
 
     const fetchCustomers = async () => {
         try {
-            const response = await axios.get(`${API_URL}/customers`);
+            const response = await api.get('/customers');
             setCustomers(response.data);
         } catch (error) {
             console.error('Error fetching customers:', error);
@@ -50,7 +48,7 @@ const AdminOrders = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`${API_URL}/products`);
+            const response = await api.get('/products');
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -89,17 +87,16 @@ const AdminOrders = () => {
                 ...formData,
                 customerId: parseInt(formData.customerId),
                 totalAmount,
-                orderDate: selectedOrder ? selectedOrder.orderDate : new Date().toISOString(),
                 orderNumber: selectedOrder?.orderNumber || ''
             };
 
             if (selectedOrder) {
-                await axios.put(`${API_URL}/orders/${selectedOrder.id}`, {
+                await api.put(`/orders/${selectedOrder.id}`, {
                     ...data,
                     id: selectedOrder.id
                 });
             } else {
-                await axios.post(`${API_URL}/orders`, data);
+                await api.post('/orders', data);
             }
             setIsModalOpen(false);
             fetchOrders();
@@ -111,7 +108,7 @@ const AdminOrders = () => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`${API_URL}/orders/${selectedOrder.id}`);
+            await api.delete(`/orders/${selectedOrder.id}`);
             setIsDeleteModalOpen(false);
             fetchOrders();
         } catch (error) {
@@ -140,9 +137,15 @@ const AdminOrders = () => {
         },
         {
             header: 'Ngày đặt',
-            accessor: 'orderDate',
+            accessor: 'createdAt',
             sortable: true,
-            render: (item) => new Date(item.orderDate).toLocaleDateString('vi-VN')
+            render: (item) => new Date(item.createdAt).toLocaleString('vi-VN')
+        },
+        {
+            header: 'Cập nhật',
+            accessor: 'updatedAt',
+            sortable: true,
+            render: (item) => new Date(item.updatedAt).toLocaleString('vi-VN')
         },
         {
             header: 'Tổng tiền',

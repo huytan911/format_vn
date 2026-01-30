@@ -86,8 +86,7 @@ public class ProductsController : ControllerBase
             Price = dto.Price,
             ImageUrl = dto.ImageUrl,
             Stock = dto.Stock,
-            IsFeatured = dto.IsFeatured,
-            CreatedAt = DateTime.Now
+            IsFeatured = dto.IsFeatured
         };
 
         // Add Categories
@@ -121,56 +120,88 @@ public class ProductsController : ControllerBase
     [Authorize(Roles = "SuperAdmin,Manager,Staff")]
     public async Task<IActionResult> UpdateProduct(int id, UpdateProductDto dto)
     {
+        Console.WriteLine($"[UpdateProduct] Request for ID: {id}, Name: {dto.Name}, CategoryIds: {string.Join(",", dto.CategoryIds ?? new List<int>())}");
+
         if (id != dto.Id)
         {
+            Console.WriteLine("[UpdateProduct] Mismatch ID");
             return BadRequest();
         }
 
-        var product = await _context.Products
-            .Include(p => p.ProductCategories)
-            .FirstOrDefaultAsync(p => p.Id == id);
+        try {
+            var product = await _context.Products
+                .Include(p => p.ProductCategories)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-        if (product == null)
-        {
-            return NotFound();
-        }
-
-        product.Name = dto.Name;
-        product.Description = dto.Description;
-        product.Price = dto.Price;
-        product.ImageUrl = dto.ImageUrl;
-        product.Stock = dto.Stock;
-        product.IsFeatured = dto.IsFeatured;
-        
-        // Update Categories
-        // Remove existing
-        _context.ProductCategories.RemoveRange(product.ProductCategories);
-        
-        // Add new
-        if (dto.CategoryIds != null)
-        {
-            foreach (var catId in dto.CategoryIds)
+            if (product == null)
             {
-                var category = await _context.Categories.FindAsync(catId);
-                if (category != null)
+                Console.WriteLine("[UpdateProduct] Product not found");
+                return NotFound();
+            }
+
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.Price = dto.Price;
+            product.ImageUrl = dto.ImageUrl;
+            product.Stock = dto.Stock;
+            product.IsFeatured = dto.IsFeatured;
+            
+            // Update Categories
+            var existingCategoryIds = product.ProductCategories.Select(pc => pc.CategoryId).ToList();
+            var selectedCategoryIds = dto.CategoryIds ?? new List<int>();
+            Console.WriteLine($"[UpdateProduct] Existing Cats: {string.Join(",", existingCategoryIds)}");
+            Console.WriteLine($"[UpdateProduct] Selected Cats: {string.Join(",", selectedCategoryIds)}");
+
+            // Identify categories to remove
+            var categoriesToRemove = product.ProductCategories
+                .Where(pc => !selectedCategoryIds.Contains(pc.CategoryId))
+                .ToList();
+                
+            if (categoriesToRemove.Any())
+            {
+                Console.WriteLine($"[UpdateProduct] Removing {categoriesToRemove.Count} categories");
+                _context.ProductCategories.RemoveRange(categoriesToRemove);
+            }
+
+            // Identify categories to add
+            var categoriesToAdd = selectedCategoryIds
+                .Where(id => !existingCategoryIds.Contains(id))
+                .ToList();
+
+            if (categoriesToAdd.Any())
+            {
+                Console.WriteLine($"[UpdateProduct] Adding {categoriesToAdd.Count} categories");
+                foreach (var catId in categoriesToAdd)
                 {
-                    _context.ProductCategories.Add(new ProductCategory
+                    var category = await _context.Categories.FindAsync(catId);
+                    if (category != null)
                     {
-                        ProductId = product.Id,
-                        CategoryId = catId
-                    });
+                        var newPc = new ProductCategory
+                        {
+                            ProductId = product.Id,
+                            CategoryId = catId
+                        };
+                        _context.ProductCategories.Add(newPc);
+                        // Console.WriteLine($"[UpdateProduct] Added relation Product {product.Id} - Category {catId}");
+                    }
+                    else 
+                    {
+                        Console.WriteLine($"[UpdateProduct] Category {catId} not found");
+                    }
                 }
             }
-        }
 
-        try
-        {
             await _context.SaveChangesAsync();
+            Console.WriteLine("[UpdateProduct] Save successful");
         }
-        catch (DbUpdateConcurrencyException)
+        catch (Exception ex)
         {
+            Console.WriteLine($"[UpdateProduct] ERROR: {ex.Message}");
+            Console.WriteLine($"[UpdateProduct] Inner Exception: {ex.InnerException?.Message}");
+            Console.WriteLine(ex.StackTrace);
             if (!ProductExists(id))
             {
+                 Console.WriteLine("[UpdateProduct] Product no longer exists");
                 return NotFound();
             }
             else
@@ -216,11 +247,14 @@ public class ProductsController : ControllerBase
             Stock = p.Stock,
             IsFeatured = p.IsFeatured,
             CreatedAt = p.CreatedAt,
+            UpdatedAt = p.UpdatedAt,
             Categories = p.ProductCategories.Select(pc => new CategoryDto
             {
                 Id = pc.Category.Id,
                 Name = pc.Category.Name,
-                ImageUrl = pc.Category.ImageUrl
+                ImageUrl = pc.Category.ImageUrl,
+                CreatedAt = pc.Category.CreatedAt,
+                UpdatedAt = pc.Category.UpdatedAt
             }).ToList()
         };
     }

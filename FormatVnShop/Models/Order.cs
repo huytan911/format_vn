@@ -1,6 +1,6 @@
 namespace FormatVnShop.Models;
 
-public class Order
+public class Order : BaseEntity
 {
     public int Id { get; set; }
     public required string OrderNumber { get; set; }

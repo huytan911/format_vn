@@ -62,14 +62,16 @@ const DataTable = ({ columns, data, onEdit, onDelete, onView }) => {
                                 <th
                                     key={column.accessor}
                                     onClick={() => column.sortable && handleSort(column.accessor)}
-                                    className={column.sortable ? 'sortable' : ''}
+                                    className={`${column.sortable ? 'sortable' : ''} ${sortConfig.key === column.accessor ? 'active-sort' : ''}`}
                                 >
-                                    {column.header}
-                                    {sortConfig.key === column.accessor && (
-                                        <span className="sort-icon">
-                                            {sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}
-                                        </span>
-                                    )}
+                                    <div className="th-content">
+                                        {column.header}
+                                        {column.sortable && (
+                                            <span className={`sort-icon ${sortConfig.key === column.accessor ? 'visible' : ''}`}>
+                                                {sortConfig.key === column.accessor && sortConfig.direction === 'desc' ? ' ▼' : ' ▲'}
+                                            </span>
+                                        )}
+                                    </div>
                                 </th>
                             ))}
                             <th className="actions-column">Thao tác</th>
