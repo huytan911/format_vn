@@ -10,7 +10,8 @@ const ProtectedRoute = ({ allowedRoles }) => {
     }
 
     if (allowedRoles && !allowedRoles.includes(user.role)) {
-        return <Navigate to="/admin/products" replace />;
+        // If logged in as customer but trying to access admin, clear and redirect to admin login
+        return <Navigate to="/admin/login" replace />;
     }
 
     return <Outlet />;

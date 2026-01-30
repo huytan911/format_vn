@@ -27,6 +27,14 @@ public class CustomersController : ControllerBase
             .ToListAsync();
     }
 
+    // GET: api/customers/debug/claims
+    [HttpGet("debug/claims")]
+    [Authorize]
+    public IActionResult GetClaims()
+    {
+        return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
+    }
+
     // GET: api/customers/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Customer>> GetCustomer(int id)

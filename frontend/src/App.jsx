@@ -41,7 +41,7 @@ function App() {
                 <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
 
                 {/* Admin Routes - Protected */}
-                <Route element={<ProtectedRoute />}>
+                <Route element={<ProtectedRoute allowedRoles={['SuperAdmin', 'Manager', 'Staff']} />}>
                   <Route path="/admin/products" element={<AdminProducts />} />
                   <Route path="/admin/products/new" element={<AdminProductEdit />} />
                   <Route path="/admin/products/edit/:id" element={<AdminProductEdit />} />

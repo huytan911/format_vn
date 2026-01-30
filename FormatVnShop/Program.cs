@@ -41,7 +41,8 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? string.Empty,
         ValidAudience = builder.Configuration["Jwt:Audience"] ?? string.Empty,
         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty)),
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role
     };
 });
 
