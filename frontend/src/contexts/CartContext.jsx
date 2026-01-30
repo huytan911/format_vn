@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import api from '../config/axiosConfig';
 import { useAuth } from './AuthContext';
+import { useToast } from './ToastContext';
 
 const CartContext = createContext();
 
@@ -10,6 +11,7 @@ export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { isAuthenticated, user } = useAuth();
+    const { showToast } = useToast();
 
     // Load from localStorage on mount (for Guest)
     useEffect(() => {
@@ -59,9 +61,11 @@ export const CartProvider = ({ children }) => {
                 // Re-fetch fetch all to be safe or update local state
                 const fetchRes = await api.get('/cart');
                 setCartItems(fetchRes.data);
+                showToast(`Đã thêm ${product.name} vào giỏ hàng`);
                 return { success: true };
             } catch (error) {
                 console.error('Error adding to backend cart:', error);
+                showToast('Không thể thêm vào giỏ hàng', 'error');
                 return { success: false };
             }
         } else {
@@ -86,6 +90,7 @@ export const CartProvider = ({ children }) => {
                     }];
                 }
                 localStorage.setItem('guest_cart', JSON.stringify(newCart));
+                showToast(`Đã thêm ${product.name} vào giỏ hàng`);
                 return newCart;
             });
             return { success: true };
@@ -114,17 +119,21 @@ export const CartProvider = ({ children }) => {
     };
 
     const removeFromCart = async (id) => {
+        const itemToRemove = cartItems.find(item => item.id === id);
         if (isAuthenticated && user?.role === 'Customer') {
             try {
                 await api.delete(`/cart/${id}`);
                 setCartItems(prev => prev.filter(item => item.id !== id));
+                showToast(`Đã xóa ${itemToRemove?.productName} khỏi giỏ hàng`, 'info');
             } catch (error) {
                 console.error('Error removing from cart:', error);
+                showToast('Không thể xóa sản phẩm', 'error');
             }
         } else {
             setCartItems(prev => {
                 const newCart = prev.filter(item => item.id !== id);
                 localStorage.setItem('guest_cart', JSON.stringify(newCart));
+                showToast(`Đã xóa ${itemToRemove?.productName} khỏi giỏ hàng`, 'info');
                 return newCart;
             });
         }

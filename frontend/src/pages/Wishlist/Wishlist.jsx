@@ -51,9 +51,13 @@ const Wishlist = () => {
                 <div className="wishlist-grid">
                     {wishlistItems.map((item) => (
                         <div key={item.id} className="wishlist-item">
-                            <div className="item-image">
-                                <Link to={`/product/${item.productId}`}>
-                                    <img src={getImageUrl(item.imageUrl)} alt={item.productName} />
+                            <div className="item-image" style={{ height: '400px', display: 'block' }}>
+                                <Link to={`/product/${item.productId}`} style={{ display: 'block', height: '100%', width: '100%' }}>
+                                    <img
+                                        src={getImageUrl(item.imageUrl)}
+                                        alt={item.productName}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
                                 </Link>
                                 <button
                                     className="remove-wishlist-btn"
@@ -74,7 +78,7 @@ const Wishlist = () => {
                                     )}
                                 </div>
                                 <button
-                                    className="add-to-cart-btn btn-primary"
+                                    className="wishlist-add-to-cart-action"
                                     onClick={() => handleAddToCart(item)}
                                     disabled={!item.isInStock}
                                 >

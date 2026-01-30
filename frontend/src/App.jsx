@@ -2,6 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
+import { ToastProvider } from './contexts/ToastContext';
+
+// Components
+import ToastContainer from './components/Toast/Toast';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Login from './pages/Login/Login';
 import Header from './components/Header/Header';
@@ -23,46 +27,49 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <Routes>
-              {/* Auth Routes */}
-              <Route path="/login" element={<CustomerLogin />} />
-              <Route path="/register" element={<CustomerRegister />} />
-              <Route path="/admin/login" element={<Login />} />
-              <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
+      <ToastProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <ToastContainer />
+              <Routes>
+                {/* Auth Routes */}
+                <Route path="/login" element={<CustomerLogin />} />
+                <Route path="/register" element={<CustomerRegister />} />
+                <Route path="/admin/login" element={<Login />} />
+                <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
 
-              {/* Admin Routes - Protected */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/admin/products" element={<AdminProducts />} />
-                <Route path="/admin/categories" element={<AdminCategories />} />
-                <Route path="/admin/customers" element={<AdminCustomers />} />
-                <Route path="/admin/orders" element={<AdminOrders />} />
-              </Route>
+                {/* Admin Routes - Protected */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/admin/products" element={<AdminProducts />} />
+                  <Route path="/admin/categories" element={<AdminCategories />} />
+                  <Route path="/admin/customers" element={<AdminCustomers />} />
+                  <Route path="/admin/orders" element={<AdminOrders />} />
+                </Route>
 
-              {/* Public Routes - with header/footer */}
-              <Route path="/*" element={
-                <div className="app">
-                  <Header />
-                  <main className="main-content">
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/category/:categoryId" element={<ProductList />} />
-                      <Route path="/products" element={<ProductList />} />
-                      <Route path="/product/:id" element={<ProductDetail />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/cart" element={<Cart />} />
-                      <Route path="/wishlist" element={<Wishlist />} />
-                    </Routes>
-                  </main>
-                  <Footer />
-                </div>
-              } />
-            </Routes>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
+                {/* Public Routes - with header/footer */}
+                <Route path="/*" element={
+                  <div className="app">
+                    <Header />
+                    <main className="main-content">
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/category/:categoryId" element={<ProductList />} />
+                        <Route path="/products" element={<ProductList />} />
+                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/cart" element={<Cart />} />
+                        <Route path="/wishlist" element={<Wishlist />} />
+                      </Routes>
+                    </main>
+                    <Footer />
+                  </div>
+                } />
+              </Routes>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ToastProvider>
     </Router>
   );
 }

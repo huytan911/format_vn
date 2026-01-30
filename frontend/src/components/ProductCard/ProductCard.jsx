@@ -32,6 +32,8 @@ const ProductCard = ({ product }) => {
         addToCart(product);
     };
 
+    const isFave = isInWishlist(product.id);
+
     return (
         <Link to={`/product/${product.id}`} className="product-card">
             <div className="product-image-wrapper">
@@ -43,18 +45,22 @@ const ProductCard = ({ product }) => {
                 <div className="product-overlay">
                     <div className="product-actions">
                         <button
-                            className={`action-btn wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}`}
+                            className={`action-btn wishlist-btn ${isFave ? 'active' : ''}`}
                             onClick={handleWishlist}
                             title="Yêu thích"
                         >
-                            <FiHeart fill={isInWishlist(product.id) ? "currentColor" : "none"} />
+                            <FiHeart
+                                size={18}
+                                color="currentColor"
+                                fill={isFave ? "currentColor" : "none"}
+                            />
                         </button>
                         <button
                             className="action-btn cart-btn"
                             onClick={handleAddToCart}
                             title="Thêm vào giỏ"
                         >
-                            <FiShoppingBag />
+                            <FiShoppingBag size={18} color="currentColor" />
                         </button>
                     </div>
                     <button className="quick-view-btn">XEM NHANH</button>
