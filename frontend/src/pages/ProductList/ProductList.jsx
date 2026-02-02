@@ -18,6 +18,16 @@ const ProductList = () => {
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [inStock, setInStock] = useState(false);
+    const [selectedColors, setSelectedColors] = useState([]);
+    const [selectedMaterials, setSelectedMaterials] = useState([]);
+    const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+    const [filterOptions, setFilterOptions] = useState({
+        colors: [],
+        materials: [],
+        categories: [],
+        minPrice: 0,
+        maxPrice: 0
+    });
     const [showFilters, setShowFilters] = useState(false);
 
     // Debounce search term
@@ -28,6 +38,20 @@ const ProductList = () => {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
+    useEffect(() => {
+        const fetchFilters = async () => {
+            try {
+                const response = categoryId
+                    ? await productsAPI.getCategoryFilters(categoryId)
+                    : await productsAPI.getFilters();
+                setFilterOptions(response.data);
+            } catch (error) {
+                console.error('Error fetching filters:', error);
+            }
+        };
+        fetchFilters();
+    }, [categoryId]);
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -36,7 +60,10 @@ const ProductList = () => {
                 sortBy,
                 minPrice: minPrice || null,
                 maxPrice: maxPrice || null,
-                inStock: inStock || null
+                inStock: inStock || null,
+                colors: selectedColors.length > 0 ? selectedColors : null,
+                materials: selectedMaterials.length > 0 ? selectedMaterials : null,
+                categoryIds: selectedCategoryIds.length > 0 ? selectedCategoryIds : null
             };
 
             if (categoryId) {
@@ -56,7 +83,7 @@ const ProductList = () => {
         } finally {
             setLoading(false);
         }
-    }, [categoryId, debouncedSearch, sortBy, minPrice, maxPrice, inStock]);
+    }, [categoryId, debouncedSearch, sortBy, minPrice, maxPrice, inStock, selectedColors, selectedMaterials, selectedCategoryIds]);
 
     useEffect(() => {
         fetchData();
@@ -68,6 +95,17 @@ const ProductList = () => {
         setMinPrice('');
         setMaxPrice('');
         setInStock(false);
+        setSelectedColors([]);
+        setSelectedMaterials([]);
+        setSelectedCategoryIds([]);
+    };
+
+    const handleToggleFilter = (item, selectedList, setSelectedList) => {
+        if (selectedList.includes(item)) {
+            setSelectedList(selectedList.filter(i => i !== item));
+        } else {
+            setSelectedList([...selectedList, item]);
+        }
     };
 
     return (
@@ -115,39 +153,105 @@ const ProductList = () => {
 
                     {showFilters && (
                         <div className="expanded-filters">
-                            <div className="filter-group">
-                                <label>Khoảng giá (VNĐ):</label>
-                                <div className="price-inputs">
-                                    <input
-                                        type="number"
-                                        placeholder="Từ"
-                                        value={minPrice}
-                                        onChange={(e) => setMinPrice(e.target.value)}
-                                    />
-                                    <span>-</span>
-                                    <input
-                                        type="number"
-                                        placeholder="Đến"
-                                        value={maxPrice}
-                                        onChange={(e) => setMaxPrice(e.target.value)}
-                                    />
+                            <div className="filter-grid">
+                                <div className="filter-column">
+                                    <div className="filter-group">
+                                        <label>Khoảng giá (VNĐ):</label>
+                                        <div className="price-inputs">
+                                            <input
+                                                type="number"
+                                                placeholder={`Từ ${filterOptions.minPrice.toLocaleString()}`}
+                                                value={minPrice}
+                                                onChange={(e) => setMinPrice(e.target.value)}
+                                            />
+                                            <span>-</span>
+                                            <input
+                                                type="number"
+                                                placeholder={`Đến ${filterOptions.maxPrice.toLocaleString()}`}
+                                                value={maxPrice}
+                                                onChange={(e) => setMaxPrice(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="filter-group checkbox-group">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={inStock}
+                                                onChange={(e) => setInStock(e.target.checked)}
+                                            />
+                                            Còn hàng
+                                        </label>
+                                    </div>
                                 </div>
+
+                                {filterOptions.colors?.length > 0 && (
+                                    <div className="filter-column">
+                                        <div className="filter-group">
+                                            <label>Màu sắc:</label>
+                                            <div className="options-list">
+                                                {filterOptions.colors.map(color => (
+                                                    <label key={color} className="option-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedColors.includes(color)}
+                                                            onChange={() => handleToggleFilter(color, selectedColors, setSelectedColors)}
+                                                        />
+                                                        {color}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {filterOptions.materials?.length > 0 && (
+                                    <div className="filter-column">
+                                        <div className="filter-group">
+                                            <label>Chất liệu:</label>
+                                            <div className="options-list">
+                                                {filterOptions.materials.map(material => (
+                                                    <label key={material} className="option-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedMaterials.includes(material)}
+                                                            onChange={() => handleToggleFilter(material, selectedMaterials, setSelectedMaterials)}
+                                                        />
+                                                        {material}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {filterOptions.categories?.length > 0 && (
+                                    <div className="filter-column">
+                                        <div className="filter-group">
+                                            <label>{categoryId ? 'Danh mục con:' : 'Danh mục:'}</label>
+                                            <div className="options-list">
+                                                {filterOptions.categories.map(cat => (
+                                                    <label key={cat.id} className="option-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedCategoryIds.includes(cat.id)}
+                                                            onChange={() => handleToggleFilter(cat.id, selectedCategoryIds, setSelectedCategoryIds)}
+                                                        />
+                                                        {cat.name}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="filter-group checkbox-group">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={inStock}
-                                        onChange={(e) => setInStock(e.target.checked)}
-                                    />
-                                    Còn hàng
-                                </label>
+                            <div className="filter-actions">
+                                <button className="reset-btn" onClick={handleResetFilters}>
+                                    Đặt lại
+                                </button>
                             </div>
-
-                            <button className="reset-btn" onClick={handleResetFilters}>
-                                Đặt lại
-                            </button>
                         </div>
                     )}
                 </div>

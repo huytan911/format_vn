@@ -118,11 +118,20 @@
     margin-top: var(--spacing-md);
     padding-top: var(--spacing-md);
     border-top: 1px solid var(--color-border);
-    display: flex;
-    gap: var(--spacing-xl);
-    align-items: flex-end;
-    flex-wrap: wrap;
     animation: slideDown 0.3s ease-out;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+.filter-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
 }
 
 @keyframes slideDown {
@@ -140,7 +149,7 @@
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .filter-group label {
@@ -148,6 +157,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    color: var(--color-black);
 }
 
 .price-inputs {
@@ -157,11 +167,46 @@
 }
 
 .price-inputs input {
-    width: 100px;
-    padding: 8px;
+    width: 100%;
+    padding: 8px 12px;
     border: 1px solid var(--color-gray-medium);
     border-radius: 4px;
     font-size: 0.85rem;
+}
+
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.options-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.options-list::-webkit-scrollbar-thumb {
+    background: var(--color-gray-medium);
+    border-radius: 4px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 400 !important;
+    text-transform: none !important;
+    color: var(--color-black);
+}
+
+.option-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
 }
 
 .checkbox-group label {
@@ -169,22 +214,31 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    text-transform: none;
-    font-weight: 500;
+    text-transform: none !important;
+    font-weight: 500 !important;
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
 }
 
 .reset-btn {
-    padding: 8px 16px;
-    background: none;
+    padding: 8px 24px;
+    background: var(--color-white);
     border: 1px solid var(--color-black);
-    font-size: 0.8rem;
+    color: var(--color-black);
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .reset-btn:hover {
-    background-color: var(--color-gray-light);
+    background-color: var(--color-black);
+    color: var(--color-white);
 }
 
 .products-section {

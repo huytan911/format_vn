@@ -25,7 +25,10 @@ public class ProductsController : ControllerBase
         [FromQuery] string? sortBy = null,
         [FromQuery] decimal? minPrice = null,
         [FromQuery] decimal? maxPrice = null,
-        [FromQuery] bool? inStock = null)
+        [FromQuery] bool? inStock = null,
+        [FromQuery] string[]? colors = null,
+        [FromQuery] string[]? materials = null,
+        [FromQuery] int[]? categoryIds = null)
     {
         var query = _context.Products
             .Include(p => p.ProductCategories)
@@ -52,6 +55,21 @@ public class ProductsController : ControllerBase
         if (inStock.HasValue && inStock.Value)
         {
             query = query.Where(p => p.Stock > 0);
+        }
+
+        if (colors != null && colors.Any())
+        {
+            query = query.Where(p => p.Variants.Any(v => colors.Contains(v.Color)));
+        }
+
+        if (materials != null && materials.Any())
+        {
+            query = query.Where(p => p.Variants.Any(v => materials.Contains(v.Material)));
+        }
+
+        if (categoryIds != null && categoryIds.Any())
+        {
+            query = query.Where(p => p.ProductCategories.Any(pc => categoryIds.Contains(pc.CategoryId)));
         }
 
         // Sorting
@@ -93,7 +111,10 @@ public class ProductsController : ControllerBase
         [FromQuery] string? sortBy = null,
         [FromQuery] decimal? minPrice = null,
         [FromQuery] decimal? maxPrice = null,
-        [FromQuery] bool? inStock = null)
+        [FromQuery] bool? inStock = null,
+        [FromQuery] string[]? colors = null,
+        [FromQuery] string[]? materials = null,
+        [FromQuery] int[]? categoryIds = null)
     {
         var query = _context.Products
             .Include(p => p.ProductCategories)
@@ -123,6 +144,22 @@ public class ProductsController : ControllerBase
             query = query.Where(p => p.Stock > 0);
         }
 
+        if (colors != null && colors.Any())
+        {
+            query = query.Where(p => p.Variants.Any(v => colors.Contains(v.Color)));
+        }
+
+        if (materials != null && materials.Any())
+        {
+            query = query.Where(p => p.Variants.Any(v => materials.Contains(v.Material)));
+        }
+
+        // Additional Category filtering (for child categories within this category)
+        if (categoryIds != null && categoryIds.Any())
+        {
+            query = query.Where(p => p.ProductCategories.Any(pc => categoryIds.Contains(pc.CategoryId)));
+        }
+
         // Sorting
         query = sortBy switch
         {
@@ -134,6 +171,85 @@ public class ProductsController : ControllerBase
 
         var products = await query.ToListAsync();
         return products.Select(MapToDto).ToList();
+    }
+
+    // GET: api/products/filters
+    [HttpGet("filters")]
+    public async Task<ActionResult<FilterOptionsDto>> GetFilterOptions()
+    {
+        var colors = await _context.ProductVariants
+            .Where(v => !string.IsNullOrEmpty(v.Color))
+            .Select(v => v.Color!)
+            .Distinct()
+            .ToListAsync();
+
+        var materials = await _context.ProductVariants
+            .Where(v => !string.IsNullOrEmpty(v.Material))
+            .Select(v => v.Material!)
+            .Distinct()
+            .ToListAsync();
+
+        var prices = await _context.Products.Select(p => p.Price).ToListAsync();
+        var minPrice = prices.Any() ? prices.Min() : 0;
+        var maxPrice = prices.Any() ? prices.Max() : 0;
+
+        var categories = await _context.Categories
+            .Where(c => c.ParentId == null)
+            .Select(c => new FilterCategoryDto { Id = c.Id, Name = c.Name })
+            .ToListAsync();
+
+        return new FilterOptionsDto
+        {
+            Colors = colors,
+            Materials = materials,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice,
+            Categories = categories
+        };
+    }
+
+    // GET: api/products/category/{categoryId}/filters
+    [HttpGet("category/{categoryId}/filters")]
+    public async Task<ActionResult<FilterOptionsDto>> GetCategoryFilterOptions(int categoryId)
+    {
+        var productIds = await _context.ProductCategories
+            .Where(pc => pc.CategoryId == categoryId)
+            .Select(pc => pc.ProductId)
+            .ToListAsync();
+
+        var colors = await _context.ProductVariants
+            .Where(v => productIds.Contains(v.ProductId) && !string.IsNullOrEmpty(v.Color))
+            .Select(v => v.Color!)
+            .Distinct()
+            .ToListAsync();
+
+        var materials = await _context.ProductVariants
+            .Where(v => productIds.Contains(v.ProductId) && !string.IsNullOrEmpty(v.Material))
+            .Select(v => v.Material!)
+            .Distinct()
+            .ToListAsync();
+
+        var prices = await _context.Products
+            .Where(p => productIds.Contains(p.Id))
+            .Select(p => p.Price)
+            .ToListAsync();
+            
+        var minPrice = prices.Any() ? prices.Min() : 0;
+        var maxPrice = prices.Any() ? prices.Max() : 0;
+
+        var childCategories = await _context.Categories
+            .Where(c => c.ParentId == categoryId)
+            .Select(c => new FilterCategoryDto { Id = c.Id, Name = c.Name })
+            .ToListAsync();
+
+        return new FilterOptionsDto
+        {
+            Colors = colors,
+            Materials = materials,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice,
+            Categories = childCategories
+        };
     }
     
     // GET: api/products/featured
@@ -186,8 +302,10 @@ public class ProductsController : ControllerBase
         // Add Variants
         if (dto.Variants != null && dto.Variants.Any())
         {
-            foreach (var v in dto.Variants)
+            var hasDefault = dto.Variants.Any(v => v.IsDefault);
+            for (int i = 0; i < dto.Variants.Count; i++)
             {
+                var v = dto.Variants[i];
                 product.Variants.Add(new ProductVariant
                 {
                     Color = v.Color,
@@ -197,9 +315,15 @@ public class ProductsController : ControllerBase
                     Price = v.Price,
                     Stock = v.Stock,
                     ImageUrl = v.ImageUrl,
+                    IsDefault = hasDefault ? v.IsDefault : (i == 0),
                     CreatedAt = DateTime.Now
                 });
             }
+        }
+        // Calculate total stock from variants if they exist
+        if (product.Variants.Any())
+        {
+            product.Stock = product.Variants.Sum(v => v.Stock);
         }
         
         _context.Products.Add(product);
@@ -310,6 +434,7 @@ public class ProductsController : ControllerBase
                         existingV.Price = vDto.Price;
                         existingV.Stock = vDto.Stock;
                         existingV.ImageUrl = vDto.ImageUrl;
+                        existingV.IsDefault = vDto.IsDefault;
                     }
                 }
                 else
@@ -323,9 +448,31 @@ public class ProductsController : ControllerBase
                         Price = vDto.Price,
                         Stock = vDto.Stock,
                         ImageUrl = vDto.ImageUrl,
+                        IsDefault = vDto.IsDefault,
                         CreatedAt = DateTime.Now
                     });
                 }
+            }
+
+            // Ensure exactly one default if variants exist
+            if (product.Variants.Any())
+            {
+                var defaultVariants = product.Variants.Where(v => v.IsDefault).ToList();
+                if (defaultVariants.Count == 0)
+                {
+                    product.Variants.First().IsDefault = true;
+                }
+                else if (defaultVariants.Count > 1)
+                {
+                    // keep only the first one as default
+                    for (int i = 1; i < defaultVariants.Count; i++)
+                    {
+                        defaultVariants[i].IsDefault = false;
+                    }
+                }
+
+                // Sync total stock
+                product.Stock = product.Variants.Sum(v => v.Stock);
             }
 
             await _context.SaveChangesAsync();
@@ -404,6 +551,7 @@ public class ProductsController : ControllerBase
                 Price = v.Price,
                 Stock = v.Stock,
                 ImageUrl = v.ImageUrl,
+                IsDefault = v.IsDefault,
                 CreatedAt = v.CreatedAt,
                 UpdatedAt = v.UpdatedAt
             }).ToList()

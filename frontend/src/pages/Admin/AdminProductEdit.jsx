@@ -82,11 +82,17 @@ const AdminProductEdit = () => {
                         size,
                         sku: `${formData.name.substring(0, 3).toUpperCase()}-${color.substring(0, 3).toUpperCase()}-${size.toUpperCase()}`,
                         price: '',
-                        stock: 0
+                        stock: 0,
+                        isDefault: false
                     });
                 });
             });
         });
+
+        // Mark first one as default if any created
+        if (newVariants.length > 0) {
+            newVariants[0].isDefault = true;
+        }
 
         if (window.confirm(`Bạn có muốn tạo ${newVariants.length} phiên bản? Việc này sẽ thay thế danh sách hiện tại.`)) {
             setFormData(prev => ({ ...prev, variants: newVariants }));
@@ -137,7 +143,7 @@ const AdminProductEdit = () => {
             ...prev,
             variants: [
                 ...prev.variants,
-                { id: 0, color: '', material: '', size: '', sku: '', price: '', stock: 0 }
+                { id: 0, color: '', material: '', size: '', sku: '', price: '', stock: 0, isDefault: prev.variants.length === 0 }
             ]
         }));
     };
@@ -151,8 +157,13 @@ const AdminProductEdit = () => {
 
     const handleVariantChange = (index, field, value) => {
         setFormData(prev => {
-            const newVariants = [...prev.variants];
-            newVariants[index] = { ...newVariants[index], [field]: value };
+            let newVariants = [...prev.variants];
+            if (field === 'isDefault' && value === true) {
+                // Unset other defaults
+                newVariants = newVariants.map((v, i) => ({ ...v, isDefault: i === index }));
+            } else {
+                newVariants[index] = { ...newVariants[index], [field]: value };
+            }
             return { ...prev, variants: newVariants };
         });
     };
@@ -302,6 +313,7 @@ const AdminProductEdit = () => {
                                                 <th>SKU</th>
                                                 <th>Giá lẻ</th>
                                                 <th>Kho</th>
+                                                <th>Mặc định</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -379,6 +391,14 @@ const AdminProductEdit = () => {
                                                             value={variant.stock}
                                                             onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
                                                             required
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            type="radio"
+                                                            name="defaultVariant"
+                                                            checked={variant.isDefault}
+                                                            onChange={(e) => handleVariantChange(index, 'isDefault', e.target.checked)}
                                                         />
                                                     </td>
                                                     <td>

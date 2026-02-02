@@ -6,6 +6,8 @@ export const productsAPI = {
   getById: (id) => api.get(`/products/${id}`),
   getByCategory: (categoryId, params) => api.get(`/products/category/${categoryId}`, { params }),
   getFeatured: () => api.get('/products/featured'),
+  getFilters: () => api.get('/products/filters'),
+  getCategoryFilters: (categoryId) => api.get(`/products/category/${categoryId}/filters`),
 };
 
 // Categories API

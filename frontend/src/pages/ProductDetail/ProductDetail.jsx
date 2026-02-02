@@ -13,6 +13,8 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [selectedVariant, setSelectedVariant] = useState(null);
+    const [selectedColor, setSelectedColor] = useState(null);
+    const [selectedSize, setSelectedSize] = useState(null);
     const { addToCart } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
@@ -21,9 +23,12 @@ const ProductDetail = () => {
             try {
                 const response = await productsAPI.getById(id);
                 setProduct(response.data);
-                // Auto-select first variant if available
+                // Auto-select default variant if available, otherwise pick first
                 if (response.data.variants?.length > 0) {
-                    setSelectedVariant(response.data.variants[0]);
+                    const defaultVariant = response.data.variants.find(v => v.isDefault) || response.data.variants[0];
+                    setSelectedVariant(defaultVariant);
+                    setSelectedColor(defaultVariant.color);
+                    setSelectedSize(defaultVariant.size);
                 }
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -34,6 +39,49 @@ const ProductDetail = () => {
 
         fetchProduct();
     }, [id]);
+
+    // Derived values for selection
+    const availableColors = product?.variants
+        ? product.variants.reduce((acc, v) => {
+            const existing = acc.find(a => a.name === v.color);
+            if (existing) {
+                existing.stock += v.stock;
+            } else if (v.color) {
+                acc.push({ name: v.color, stock: v.stock });
+            }
+            return acc;
+        }, [])
+        : [];
+
+    const availableSizesForColor = product?.variants && selectedColor
+        ? product.variants
+            .filter(v => v.color === selectedColor && v.size)
+            .map(v => ({ name: v.size, stock: v.stock }))
+        : [];
+
+    const handleColorSelect = (color) => {
+        setSelectedColor(color);
+        // Find if current size exists for this color
+        const matchingVariant = product.variants.find(v => v.color === color && v.size === selectedSize);
+        if (matchingVariant) {
+            setSelectedVariant(matchingVariant);
+        } else {
+            // Pick first available size for this color
+            const firstAvailable = product.variants.find(v => v.color === color);
+            if (firstAvailable) {
+                setSelectedSize(firstAvailable.size);
+                setSelectedVariant(firstAvailable);
+            }
+        }
+    };
+
+    const handleSizeSelect = (size) => {
+        setSelectedSize(size);
+        const matchingVariant = product.variants.find(v => v.color === selectedColor && v.size === size);
+        if (matchingVariant) {
+            setSelectedVariant(matchingVariant);
+        }
+    };
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -102,8 +150,48 @@ const ProductDetail = () => {
                         </div>
 
                         {product.variants && product.variants.length > 0 && (
-                            <div className="variant-selection-info">
-                                <p>Phiên bản đang chọn: <strong>{selectedVariant ? `${selectedVariant.color} / ${selectedVariant.size} - ${selectedVariant.material}` : 'Chưa chọn'}</strong></p>
+                            <div className="product-selection-controls">
+                                {availableColors.length > 0 && (
+                                    <div className="selection-group">
+                                        <label>Màu sắc:</label>
+                                        <div className="selection-options">
+                                            {availableColors.map(colorObj => (
+                                                <button
+                                                    key={colorObj.name}
+                                                    className={`selection-item ${selectedColor === colorObj.name ? 'active' : ''} ${colorObj.stock <= 0 ? 'out-of-stock' : ''}`}
+                                                    onClick={() => handleColorSelect(colorObj.name)}
+                                                    title={colorObj.stock <= 0 ? 'Hết hàng' : `${colorObj.stock} sản phẩm`}
+                                                >
+                                                    {colorObj.name}
+                                                    {colorObj.stock > 0 && <span className="item-stock-tag">({colorObj.stock})</span>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {availableSizesForColor.length > 0 && (
+                                    <div className="selection-group">
+                                        <label>Kích thước:</label>
+                                        <div className="selection-options">
+                                            {availableSizesForColor.map(sizeObj => (
+                                                <button
+                                                    key={sizeObj.name}
+                                                    className={`selection-item ${selectedSize === sizeObj.name ? 'active' : ''} ${sizeObj.stock <= 0 ? 'out-of-stock' : ''}`}
+                                                    onClick={() => handleSizeSelect(sizeObj.name)}
+                                                    title={sizeObj.stock <= 0 ? 'Hết hàng' : `${sizeObj.stock} sản phẩm`}
+                                                >
+                                                    {sizeObj.name}
+                                                    {sizeObj.stock > 0 && <span className="item-stock-tag">({sizeObj.stock})</span>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="variant-selection-info">
+                                    <p>Đang chọn: <strong>{selectedVariant ? `${selectedVariant.color} / ${selectedVariant.size} - ${selectedVariant.material}` : 'Chưa chọn'}</strong></p>
+                                </div>
                             </div>
                         )}
 
