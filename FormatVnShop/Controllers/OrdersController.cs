@@ -50,8 +50,28 @@ public class OrdersController : ControllerBase
 
     // POST: api/orders
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Order>> CreateOrder(Order order)
     {
+        // Security: Override CustomerId from logged-in user to prevent spoofing or invalid 0 IDs
+        // Use ClaimTypes.Email to find the user, as Identity.Name maps to ClaimTypes.Name (the user's name, not email)
+        var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        
+        if (string.IsNullOrEmpty(userEmail))
+        {
+             return Unauthorized("Invalid token: Email claim missing.");
+        }
+
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == userEmail);
+        
+        if (customer == null)
+        {
+            return BadRequest("Customer account not found for this user.");
+        }
+        
+        order.CustomerId = customer.Id;
+        order.Customer = null; // Ensure no nested object causes EF issues
+
         order.OrderDate = DateTime.Now;
         
         // Generate order number if not provided
@@ -65,8 +85,26 @@ public class OrdersController : ControllerBase
             order.OrderNumber = $"ORD-{DateTime.Now:yyyy}-{nextNumber:D4}";
         }
         
+        // Clear circular references or unnecessary child object data if any
+        foreach (var item in order.OrderItems)
+        {
+            item.Order = null;
+            item.Product = null;
+            item.ProductVariant = null;
+        }
+
         _context.Orders.Add(order);
-        await _context.SaveChangesAsync();
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            // Log the error (console for now)
+            Console.WriteLine($"Error creating order: {ex.InnerException?.Message ?? ex.Message}");
+            return BadRequest($"Unable to create order: {ex.InnerException?.Message ?? ex.Message}");
+        }
 
         return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
     }

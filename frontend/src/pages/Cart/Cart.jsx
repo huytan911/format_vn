@@ -109,9 +109,9 @@ const Cart = () => {
                                 <span>THÀNH TIỀN:</span>
                                 <span>{formatPrice(cartTotal)}</span>
                             </div>
-                            <button className="checkout-btn btn-primary">
+                            <Link to="/checkout/shipping" className="checkout-btn btn-primary" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
                                 TIẾN HÀNH THANH TOÁN
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

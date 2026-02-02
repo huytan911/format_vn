@@ -11,7 +11,7 @@ import '../../styles/admin.css';
 const AdminProductEdit = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const isEdit = id !== 'new';
+    const isEdit = id && id !== 'new' && id !== 'undefined';
 
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(isEdit);

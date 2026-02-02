@@ -22,6 +22,10 @@ import CustomerLogin from './pages/Auth/CustomerLogin';
 import CustomerRegister from './pages/Auth/CustomerRegister';
 import Profile from './pages/Customer/Profile';
 import Cart from './pages/Cart/Cart';
+import CheckoutShipping from './pages/Checkout/CheckoutShipping';
+import CheckoutPayment from './pages/Checkout/CheckoutPayment';
+import CheckoutResult from './pages/Checkout/CheckoutResult';
+import OrderSuccess from './pages/Checkout/OrderSuccess';
 import Wishlist from './pages/Wishlist/Wishlist';
 import './App.css';
 
@@ -62,6 +66,10 @@ function App() {
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/cart" element={<Cart />} />
+                        <Route path="/checkout/shipping" element={<ProtectedRoute allowedRoles={['Customer']}><CheckoutShipping /></ProtectedRoute>} />
+                        <Route path="/checkout/payment" element={<ProtectedRoute allowedRoles={['Customer']}><CheckoutPayment /></ProtectedRoute>} />
+                        <Route path="/checkout/result" element={<ProtectedRoute allowedRoles={['Customer']}><CheckoutResult /></ProtectedRoute>} />
+                        <Route path="/checkout/success" element={<ProtectedRoute allowedRoles={['Customer']}><OrderSuccess /></ProtectedRoute>} />
                         <Route path="/wishlist" element={<Wishlist />} />
                       </Routes>
                     </main>

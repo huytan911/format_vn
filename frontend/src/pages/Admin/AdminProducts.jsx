@@ -62,10 +62,20 @@ const AdminProducts = () => {
     };
 
     const handleEdit = (product) => {
+        if (!product || !product.id) {
+            console.error('Invalid product for edit:', product);
+            showNotification('Lỗi: Sản phẩm không hợp lệ', 'error');
+            return;
+        }
         navigate(`/admin/products/edit/${product.id}`);
     };
 
     const handleDelete = (product) => {
+        if (!product || !product.id) {
+            console.error('Invalid product for delete:', product);
+            showNotification('Lỗi: Sản phẩm không hợp lệ', 'error');
+            return;
+        }
         setSelectedProduct(product);
         setIsDeleteModalOpen(true);
     };

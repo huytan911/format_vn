@@ -57,16 +57,113 @@
     margin-bottom: var(--spacing-lg);
 }
 
-.product-description {
-    padding: var(--spacing-md) 0;
+.product-tabs-section {
+    margin: var(--spacing-lg) 0;
     border-top: 1px solid var(--color-gray-medium);
-    border-bottom: 1px solid var(--color-gray-medium);
-    margin-bottom: var(--spacing-lg);
 }
 
-.product-description p {
+.product-tabs-header {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--color-gray-light);
+    margin-bottom: var(--spacing-md);
+    width: 100%;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: var(--spacing-md) 0;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--color-gray-dark);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-fast);
+    text-align: center;
+}
+
+.tab-btn:hover {
+    color: var(--color-accent);
+    background-color: rgba(206, 49, 49, 0.05);
+}
+
+.tab-btn.active {
+    color: var(--color-black);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-black);
+}
+
+.tab-content {
+    min-height: 150px;
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray-medium);
+}
+
+.product-description p,
+.product-specifications p,
+.product-policies p {
     color: var(--color-gray-dark);
     line-height: 1.8;
+}
+
+.specs-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+}
+
+.specs-list li {
+    font-size: 0.95rem;
+    color: var(--color-gray-dark);
+}
+
+.specs-list li strong {
+    color: var(--color-black);
+}
+
+.policy-item {
+    margin-bottom: var(--spacing-md);
+}
+
+.policy-item h5 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-black);
+}
+
+.policy-item p {
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .product-stock {

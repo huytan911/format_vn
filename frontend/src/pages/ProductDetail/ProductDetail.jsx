@@ -15,6 +15,7 @@ const ProductDetail = () => {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [selectedColor, setSelectedColor] = useState(null);
     const [selectedSize, setSelectedSize] = useState(null);
+    const [activeTab, setActiveTab] = useState('description');
     const { addToCart } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
@@ -128,6 +129,66 @@ const ProductDetail = () => {
                                 alt={product.name}
                             />
                         </div>
+
+                        <div className="product-tabs-section">
+                            <div className="product-tabs-header">
+                                <button
+                                    className={`tab-btn ${activeTab === 'description' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('description')}
+                                >
+                                    MÔ TẢ
+                                </button>
+                                <button
+                                    className={`tab-btn ${activeTab === 'detail' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('detail')}
+                                >
+                                    CHI TIẾT
+                                </button>
+                                <button
+                                    className={`tab-btn ${activeTab === 'policy' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('policy')}
+                                >
+                                    CHÍNH SÁCH
+                                </button>
+                            </div>
+
+                            <div className="tab-content">
+                                {activeTab === 'description' && (
+                                    <div className="product-description fade-in">
+                                        <p>{product.description || 'Chưa có mô tả cho sản phẩm này.'}</p>
+                                    </div>
+                                )}
+
+                                {activeTab === 'detail' && (
+                                    <div className="product-specifications fade-in">
+                                        <ul className="specs-list">
+                                            <li><strong>Chất liệu:</strong> {selectedVariant?.material || 'Liên hệ để biết thêm chi tiết'}</li>
+                                            <li><strong>Phân loại:</strong> {product.category?.name || 'Sản phẩm mới'}</li>
+                                            <li><strong>Kích thước:</strong> {selectedVariant?.size || 'Đa dạng'}</li>
+                                            <li><strong>Màu sắc:</strong> {selectedColor || 'Đa dạng'}</li>
+                                            <li><strong>SKU:</strong> {selectedVariant?.sku || `#${product.id}`}</li>
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {activeTab === 'policy' && (
+                                    <div className="product-policies fade-in">
+                                        <div className="policy-item">
+                                            <h5>MIỄN PHÍ GIAO HÀNG</h5>
+                                            <p>Miễn phí giao hàng cho đơn hàng từ 1.000.000đ trở lên.</p>
+                                        </div>
+                                        <div className="policy-item">
+                                            <h5>ĐỔI TRẢ DỄ DÀNG</h5>
+                                            <p>Đổi sản phẩm trong vòng 7 ngày nếu do lỗi từ nhà sản xuất.</p>
+                                        </div>
+                                        <div className="policy-item">
+                                            <h5>BẢO MẬT THANH TOÁN</h5>
+                                            <p>Mọi thông tin giao dịch đều được mã hóa và bảo mật tuyệt đối.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="product-details">
@@ -138,12 +199,6 @@ const ProductDetail = () => {
                         <p className="product-price-large">
                             {formatPrice(selectedVariant?.price || product.price)}
                         </p>
-
-                        {product.description && (
-                            <div className="product-description">
-                                <p>{product.description}</p>
-                            </div>
-                        )}
 
                         <div className="product-stock">
                             <p>Còn hàng: <strong>{selectedVariant ? selectedVariant.stock : product.stock} sản phẩm</strong></p>

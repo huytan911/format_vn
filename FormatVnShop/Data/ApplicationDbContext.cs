@@ -40,6 +40,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<AdminUser> AdminUsers { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<WishlistItem> WishlistItems { get; set; }
+    public DbSet<Address> Addresses { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
