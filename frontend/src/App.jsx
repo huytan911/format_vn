@@ -21,6 +21,7 @@ import AdminProductEdit from './pages/Admin/AdminProductEdit';
 import CustomerLogin from './pages/Auth/CustomerLogin';
 import CustomerRegister from './pages/Auth/CustomerRegister';
 import Profile from './pages/Customer/Profile';
+
 import Cart from './pages/Cart/Cart';
 import CheckoutShipping from './pages/Checkout/CheckoutShipping';
 import CheckoutPayment from './pages/Checkout/CheckoutPayment';
@@ -65,6 +66,7 @@ function App() {
                         <Route path="/products" element={<ProductList />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/profile" element={<Profile />} />
+
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/checkout/shipping" element={<ProtectedRoute allowedRoles={['Customer']}><CheckoutShipping /></ProtectedRoute>} />
                         <Route path="/checkout/payment" element={<ProtectedRoute allowedRoles={['Customer']}><CheckoutPayment /></ProtectedRoute>} />

@@ -7,6 +7,7 @@ public class CustomerRegisterDto
     public required string Password { get; set; }
     public string? Phone { get; set; }
     public string? Address { get; set; }
+    public bool IsSubscribed { get; set; }
 }
 
 public class CustomerProfileDto
@@ -15,6 +16,7 @@ public class CustomerProfileDto
     public required string Email { get; set; }
     public string? Phone { get; set; }
     public string? Address { get; set; }
+    public bool IsSubscribed { get; set; }
 }
 
 public class CustomerAuthResponse

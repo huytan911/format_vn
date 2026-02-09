@@ -110,7 +110,8 @@ public class AuthController : ControllerBase
             Email = registerDto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
             Phone = registerDto.Phone,
-            Address = registerDto.Address
+            Address = registerDto.Address,
+            IsSubscribed = registerDto.IsSubscribed
         };
 
         _context.Customers.Add(customer);
@@ -152,7 +153,8 @@ public class AuthController : ControllerBase
             Name = customer.Name,
             Email = customer.Email,
             Phone = customer.Phone,
-            Address = customer.Address
+            Address = customer.Address,
+            IsSubscribed = customer.IsSubscribed
         });
     }
 
@@ -169,6 +171,7 @@ public class AuthController : ControllerBase
         customer.Name = profileDto.Name;
         customer.Phone = profileDto.Phone;
         customer.Address = profileDto.Address;
+        customer.IsSubscribed = profileDto.IsSubscribed;
 
         await _context.SaveChangesAsync();
         return NoContent();

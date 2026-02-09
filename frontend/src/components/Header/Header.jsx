@@ -36,25 +36,14 @@ const Header = () => {
 
                         <div className="account-menu">
                             {isAuthenticated ? (
-                                <div className="user-dropdown">
-                                    <button className="icon-btn user-name" aria-label="Account">
-                                        <FiUser size={20} />
-                                        <span>{user.name}</span>
-                                    </button>
-                                    <div className="dropdown-content">
-                                        {user.role === 'Customer' ? (
-                                            <>
-                                                <Link to="/profile">Tài khoản</Link>
-                                                <Link to="/orders">Đơn hàng</Link>
-                                            </>
-                                        ) : (
-                                            <Link to="/admin/products">Quản trị</Link>
-                                        )}
-                                        <button onClick={logout} className="logout-btn">
-                                            <FiLogOut size={16} /> Đăng xuất
-                                        </button>
-                                    </div>
-                                </div>
+                                <Link
+                                    to={user.role === 'Customer' ? "/profile" : "/admin/products"}
+                                    className="icon-btn user-name"
+                                    aria-label="Account"
+                                >
+                                    <FiUser size={20} />
+                                    <span>{user.name}</span>
+                                </Link>
                             ) : (
                                 <div className="auth-links">
                                     <Link to="/login" className="auth-link">ĐĂNG NHẬP</Link>

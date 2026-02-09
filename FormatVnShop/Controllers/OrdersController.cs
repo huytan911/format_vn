@@ -53,6 +53,33 @@ public class OrdersController : ControllerBase
         return order;
     }
 
+    // GET: api/orders/my
+    [HttpGet("my")]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<Order>>> GetMyOrders()
+    {
+        var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized("Invalid token: Email claim missing.");
+        }
+
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == userEmail);
+
+        if (customer == null)
+        {
+            return BadRequest("Customer account not found for this user.");
+        }
+
+        return await _context.Orders
+            .Where(o => o.CustomerId == customer.Id)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+            .OrderByDescending(o => o.OrderDate)
+            .ToListAsync();
+    }
+
     // POST: api/orders
     [HttpPost]
     [Authorize]

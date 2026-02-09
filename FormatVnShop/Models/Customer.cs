@@ -8,6 +8,7 @@ public class Customer : BaseEntity
     public string? PasswordHash { get; set; }
     public string? Phone { get; set; }
     public string? Address { get; set; }
+    public bool IsSubscribed { get; set; }
     
     // Navigation property
     public ICollection<Order> Orders { get; set; } = new List<Order>();
