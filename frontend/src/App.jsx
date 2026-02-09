@@ -21,6 +21,7 @@ import AdminProductEdit from './pages/Admin/AdminProductEdit';
 import CustomerLogin from './pages/Auth/CustomerLogin';
 import CustomerRegister from './pages/Auth/CustomerRegister';
 import Profile from './pages/Customer/Profile';
+import SearchResults from './pages/SearchResults/SearchResults';
 
 import Cart from './pages/Cart/Cart';
 import CheckoutShipping from './pages/Checkout/CheckoutShipping';
@@ -65,6 +66,7 @@ function App() {
                         <Route path="/category/:categoryId" element={<ProductList />} />
                         <Route path="/products" element={<ProductList />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/search" element={<SearchResults />} />
                         <Route path="/profile" element={<Profile />} />
 
                         <Route path="/cart" element={<Cart />} />

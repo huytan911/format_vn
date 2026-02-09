@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import usePageTitle from '../../hooks/usePageTitle';
 import ProductGrid from '../../components/ProductGrid/ProductGrid';
 import Pagination from '../../components/Common/Pagination';
-import { productsAPI, categoriesAPI } from '../../services/api';
+import { productsAPI } from '../../services/api';
 import { FiSearch, FiSliders } from 'react-icons/fi';
-import './ProductList.css';
+import '../ProductList/ProductList.css'; // Reuse ProductList styles
 
-const ProductList = () => {
-    const { categoryId } = useParams();
+const SearchResults = () => {
+    const [searchParams] = useSearchParams();
+    const query = searchParams.get('q') || '';
     const [products, setProducts] = useState([]);
-    const [category, setCategory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -19,78 +19,51 @@ const ProductList = () => {
         totalCount: 0
     });
 
-    usePageTitle(category ? category.name : 'Sản phẩm');
+    usePageTitle(`Kết quả tìm kiếm cho "${query}"`);
 
     // Filter & Sort State
-    const [searchTerm, setSearchTerm] = useState('');
-    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [sortBy, setSortBy] = useState('newest');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [inStock, setInStock] = useState(false);
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedMaterials, setSelectedMaterials] = useState([]);
-    const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
     const [filterOptions, setFilterOptions] = useState({
         colors: [],
         materials: [],
-        categories: [],
         minPrice: 0,
         maxPrice: 0
     });
     const [showFilters, setShowFilters] = useState(false);
 
-    // Debounce search term
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(searchTerm);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [searchTerm]);
-
     useEffect(() => {
         const fetchFilters = async () => {
             try {
-                const response = categoryId
-                    ? await productsAPI.getCategoryFilters(categoryId)
-                    : await productsAPI.getFilters();
+                const response = await productsAPI.getFilters();
                 setFilterOptions(response.data);
             } catch (error) {
                 console.error('Error fetching filters:', error);
             }
         };
         fetchFilters();
-    }, [categoryId]);
+    }, []);
 
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
         try {
             const params = {
-                searchTerm: debouncedSearch,
+                searchTerm: query,
                 sortBy,
                 minPrice: minPrice || null,
                 maxPrice: maxPrice || null,
                 inStock: inStock || null,
                 colors: selectedColors.length > 0 ? selectedColors : null,
                 materials: selectedMaterials.length > 0 ? selectedMaterials : null,
-                categoryIds: selectedCategoryIds.length > 0 ? selectedCategoryIds : null,
                 page,
                 pageSize: pagination.pageSize
             };
 
-            let response;
-            if (categoryId) {
-                const [productsRes, categoryRes] = await Promise.all([
-                    productsAPI.getByCategory(categoryId, params),
-                    categoriesAPI.getById(categoryId)
-                ]);
-                response = productsRes;
-                setCategory(categoryRes.data);
-            } else {
-                response = await productsAPI.getAll(params);
-                setCategory(null);
-            }
-
+            const response = await productsAPI.getAll(params);
             const data = response.data;
             const items = Array.isArray(data) ? data : (data.items || data.Items || []);
             const totalCount = data.totalCount || data.TotalCount || items.length;
@@ -105,15 +78,15 @@ const ProductList = () => {
                 totalCount
             }));
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching search results:', error);
         } finally {
             setLoading(false);
         }
-    }, [categoryId, debouncedSearch, sortBy, minPrice, maxPrice, inStock, selectedColors, selectedMaterials, selectedCategoryIds, pagination.pageSize]);
+    }, [query, sortBy, minPrice, maxPrice, inStock, selectedColors, selectedMaterials, pagination.pageSize]);
 
     useEffect(() => {
         fetchData(1);
-    }, [categoryId, debouncedSearch, sortBy, minPrice, maxPrice, inStock, selectedColors, selectedMaterials, selectedCategoryIds]);
+    }, [fetchData]);
 
     const handlePageChange = (newPage) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -121,14 +94,12 @@ const ProductList = () => {
     };
 
     const handleResetFilters = () => {
-        setSearchTerm('');
         setSortBy('newest');
         setMinPrice('');
         setMaxPrice('');
         setInStock(false);
         setSelectedColors([]);
         setSelectedMaterials([]);
-        setSelectedCategoryIds([]);
     };
 
     const handleToggleFilter = (item, selectedList, setSelectedList) => {
@@ -144,25 +115,17 @@ const ProductList = () => {
             <div className="page-header">
                 <div className="container">
                     <h1 className="page-title">
-                        {category ? category.name : 'TẤT CẢ SẢN PHẨM'}
+                        KẾT QUẢ TÌM KIẾM
                     </h1>
-                    {category?.description && (
-                        <p className="page-description">{category.description}</p>
-                    )}
+                    <p className="page-description">Tìm thấy {pagination.totalCount} sản phẩm cho "{query}"</p>
                 </div>
             </div>
 
             <div className="filter-bar">
                 <div className="container">
                     <div className="filter-controls">
-                        <div className="search-box">
-                            <FiSearch className="search-icon" />
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm sản phẩm..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                        <div className="search-info">
+                            <FiSearch /> <span>"{query}"</span>
                         </div>
 
                         <div className="sort-box">
@@ -256,26 +219,6 @@ const ProductList = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                {filterOptions.categories?.length > 0 && (
-                                    <div className="filter-column">
-                                        <div className="filter-group">
-                                            <label>{categoryId ? 'Danh mục con:' : 'Danh mục:'}</label>
-                                            <div className="options-list">
-                                                {filterOptions.categories.map(cat => (
-                                                    <label key={cat.id} className="option-item">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedCategoryIds.includes(cat.id)}
-                                                            onChange={() => handleToggleFilter(cat.id, selectedCategoryIds, setSelectedCategoryIds)}
-                                                        />
-                                                        {cat.name}
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
 
                             <div className="filter-actions">
@@ -291,7 +234,7 @@ const ProductList = () => {
             <div className="products-section">
                 <div className="container">
                     {loading ? (
-                        <div className="loading">Đang tải sản phẩm...</div>
+                        <div className="loading">Đang tìm kiếm sản phẩm...</div>
                     ) : products.length > 0 ? (
                         <>
                             <ProductGrid products={products} />
@@ -303,7 +246,7 @@ const ProductList = () => {
                         </>
                     ) : (
                         <div className="no-results">
-                            Không tìm thấy sản phẩm nào phù hợp với lựa chọn của bạn.
+                            Không tìm thấy sản phẩm nào phù hợp với "{query}".
                         </div>
                     )}
                 </div>
@@ -312,4 +255,4 @@ const ProductList = () => {
     );
 };
 
-export default ProductList;
+export default SearchResults;

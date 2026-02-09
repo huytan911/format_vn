@@ -20,7 +20,7 @@ public class ProductsController : ControllerBase
     
     // GET: api/products
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
+    public async Task<ActionResult<PagedResponse<ProductDto>>> GetProducts(
         [FromQuery] string? searchTerm = null,
         [FromQuery] string? sortBy = null,
         [FromQuery] decimal? minPrice = null,
@@ -28,7 +28,9 @@ public class ProductsController : ControllerBase
         [FromQuery] bool? inStock = null,
         [FromQuery] string[]? colors = null,
         [FromQuery] string[]? materials = null,
-        [FromQuery] int[]? categoryIds = null)
+        [FromQuery] int[]? categoryIds = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 12)
     {
         var query = _context.Products
             .Include(p => p.ProductCategories)
@@ -81,8 +83,19 @@ public class ProductsController : ControllerBase
             _ => query.OrderByDescending(p => p.Id)
         };
 
-        var products = await query.ToListAsync();
-        return products.Select(MapToDto).ToList();
+        var totalCount = await query.CountAsync();
+        var products = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return Ok(new PagedResponse<ProductDto>
+        {
+            Items = products.Select(MapToDto),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        });
     }
     
     // GET: api/products/5
@@ -105,7 +118,7 @@ public class ProductsController : ControllerBase
     
     // GET: api/products/category/1
     [HttpGet("category/{categoryId}")]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(
+    public async Task<ActionResult<PagedResponse<ProductDto>>> GetProductsByCategory(
         int categoryId,
         [FromQuery] string? searchTerm = null,
         [FromQuery] string? sortBy = null,
@@ -114,7 +127,9 @@ public class ProductsController : ControllerBase
         [FromQuery] bool? inStock = null,
         [FromQuery] string[]? colors = null,
         [FromQuery] string[]? materials = null,
-        [FromQuery] int[]? categoryIds = null)
+        [FromQuery] int[]? categoryIds = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 12)
     {
         var query = _context.Products
             .Include(p => p.ProductCategories)
@@ -169,8 +184,19 @@ public class ProductsController : ControllerBase
             _ => query.OrderByDescending(p => p.Id)
         };
 
-        var products = await query.ToListAsync();
-        return products.Select(MapToDto).ToList();
+        var totalCount = await query.CountAsync();
+        var products = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return Ok(new PagedResponse<ProductDto>
+        {
+            Items = products.Select(MapToDto),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        });
     }
 
     // GET: api/products/filters

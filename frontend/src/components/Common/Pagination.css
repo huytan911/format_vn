@@ -1,0 +1,90 @@
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 60px;
+    padding: 20px 0;
+}
+
+.pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #1a202c;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-weight: 600;
+}
+
+.pagination-btn.number {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+}
+
+.pagination-btn.arrow {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    border-color: #1a202c;
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.pagination-btn.active {
+    background: #1a202c;
+    color: white;
+    border-color: #1a202c;
+    box-shadow: 0 10px 20px -5px rgba(26, 32, 44, 0.3);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f1f5f9;
+}
+
+/* For Premium Detail */
+.pagination-btn.active {
+    position: relative;
+    overflow: hidden;
+}
+
+.pagination-btn.active::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 100%);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    from {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    to {
+        transform: translateX(100%) rotate(45deg);
+    }
+}

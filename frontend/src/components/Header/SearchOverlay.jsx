@@ -51,7 +51,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
         setHistory(newHistory);
         localStorage.setItem('searchHistory', JSON.stringify(newHistory));
 
-        navigate(`/products?search=${encodeURIComponent(finalTerm)}`);
+        navigate(`/search?q=${encodeURIComponent(finalTerm)}`);
         onClose();
     };
 
