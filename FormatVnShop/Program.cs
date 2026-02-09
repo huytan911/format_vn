@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using FormatVnShop.Data;
+using FormatVnShop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Services
+builder.Services.AddHttpClient<IGhtkService, GhtkService>();
+builder.Services.AddScoped<IVnpayService, VnpayService>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

@@ -29,7 +29,7 @@ namespace FormatVnShop.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SKU = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     Stock = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)

@@ -222,6 +222,12 @@ const AdminProducts = () => {
         },
         { header: 'Tồn kho', accessor: 'stock', sortable: true },
         {
+            header: 'Trọng lượng',
+            accessor: 'weight',
+            sortable: true,
+            render: (item) => (item.weight || 0) + 'g'
+        },
+        {
             header: 'Nổi bật',
             accessor: 'isFeatured',
             render: (item) => (

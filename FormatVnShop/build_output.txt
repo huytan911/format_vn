@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+/home/huytan/Documents/format_vn/FormatVnShop/Services/GhtkService.cs(58,16): warning CS8602: Dereference of a possibly null reference. [/home/huytan/Documents/format_vn/FormatVnShop/FormatVnShop.csproj]
+  FormatVnShop -> /home/huytan/Documents/format_vn/FormatVnShop/bin/Debug/net9.0/FormatVnShop.dll
+
+Build succeeded.
+
+/home/huytan/Documents/format_vn/FormatVnShop/Services/GhtkService.cs(58,16): warning CS8602: Dereference of a possibly null reference. [/home/huytan/Documents/format_vn/FormatVnShop/FormatVnShop.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.32

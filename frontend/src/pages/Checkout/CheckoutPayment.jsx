@@ -51,9 +51,10 @@ const CheckoutPayment = () => {
                 customerId: user.id || 0,
                 orderNumber: "",
                 orderDate: new Date().toISOString(),
-                totalAmount: cartTotal,
+                totalAmount: cartTotal + (shippingInfo.shippingFee || 0),
                 status: "Pending",
                 shippingAddress: fullAddress,
+                paymentMethod: paymentMethod,
                 orderItems: cartItems.map(item => ({
                     productId: item.productId,
                     productVariantId: item.productVariantId,
@@ -65,6 +66,12 @@ const CheckoutPayment = () => {
             const response = await api.post('/orders', orderData);
 
             if (response.status === 201 || response.status === 200) {
+                // If VNPAY, redirect to payment gateway
+                if (paymentMethod === 'VNPAY' && response.data.paymentUrl) {
+                    window.location.href = response.data.paymentUrl;
+                    return;
+                }
+
                 setOrderPlaced(true);
                 await clearCart();
                 localStorage.removeItem('checkout_shipping');
@@ -145,18 +152,18 @@ const CheckoutPayment = () => {
                                 </div>
                             </label>
 
-                            <label className={`payment-method-item ${paymentMethod === 'BANKING' ? 'selected' : ''}`}>
+                            <label className={`payment-method-item ${paymentMethod === 'VNPAY' ? 'selected' : ''}`}>
                                 <input
                                     type="radio"
                                     name="payment"
                                     className="payment-radio"
-                                    checked={paymentMethod === 'BANKING'}
-                                    onChange={() => setPaymentMethod('BANKING')}
+                                    checked={paymentMethod === 'VNPAY'}
+                                    onChange={() => setPaymentMethod('VNPAY')}
                                 />
                                 <div className="payment-details">
-                                    <div>Chuyển khoản ngân hàng</div>
+                                    <div>Thanh toán qua VNPAY</div>
                                     <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                                        Chuyển khoản qua QR Code hoặc số tài khoản ngân hàng.
+                                        Thanh toán an toàn qua QR Code, Thẻ nội địa hoặc Thẻ quốc tế.
                                     </div>
                                 </div>
                             </label>
@@ -172,7 +179,7 @@ const CheckoutPayment = () => {
                                 disabled={isSubmitting}
                                 style={{ minWidth: '200px' }}
                             >
-                                {isSubmitting ? 'Đang xử lý...' : `ĐẶT HÀNG (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal)})`}
+                                {isSubmitting ? 'Đang xử lý...' : `ĐẶT HÀNG (${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal + (shippingInfo.shippingFee || 0))})`}
                             </button>
                         </div>
                     </div>
@@ -203,11 +210,11 @@ const CheckoutPayment = () => {
                             </div>
                             <div className="total-row">
                                 <span>Phí vận chuyển</span>
-                                <span>Miễn phí</span>
+                                <span>{shippingInfo.shippingFee > 0 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(shippingInfo.shippingFee) : 'Miễn phí'}</span>
                             </div>
                             <div className="total-row final">
                                 <span>Tổng cộng</span>
-                                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal)}</span>
+                                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal + (shippingInfo.shippingFee || 0))}</span>
                             </div>
                         </div>
                     </div>

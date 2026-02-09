@@ -10,6 +10,11 @@ public class Order : BaseEntity
     public required string Status { get; set; } // Pending, Processing, Shipped, Delivered, Cancelled
     public string? ShippingAddress { get; set; }
     
+    // Payment info
+    public string PaymentMethod { get; set; } = "COD"; // COD, VNPAY
+    public string PaymentStatus { get; set; } = "Pending"; // Pending, Paid, Failed
+    public string? VnpayTransactionId { get; set; }
+    
     // Navigation properties
     public Customer? Customer { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

@@ -8,6 +8,7 @@ public class ProductDto
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
     public int Stock { get; set; }
+    public int Weight { get; set; }
     public bool IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
@@ -35,7 +36,7 @@ public class CategoryDto
 {
     public int Id { get; set; }
     public required string Name { get; set; }
-    public string? ImageUrl { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

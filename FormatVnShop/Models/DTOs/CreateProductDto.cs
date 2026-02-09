@@ -16,6 +16,9 @@ public class CreateProductDto
     
     [Range(0, int.MaxValue)]
     public int Stock { get; set; }
+
+    [Range(0, int.MaxValue)]
+    public int Weight { get; set; }
     
     public bool IsFeatured { get; set; }
     

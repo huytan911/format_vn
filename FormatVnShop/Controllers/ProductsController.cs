@@ -536,7 +536,6 @@ public class ProductsController : ControllerBase
             {
                 Id = pc.Category.Id,
                 Name = pc.Category.Name,
-                ImageUrl = pc.Category.ImageUrl,
                 CreatedAt = pc.Category.CreatedAt,
                 UpdatedAt = pc.Category.UpdatedAt
             }).ToList(),

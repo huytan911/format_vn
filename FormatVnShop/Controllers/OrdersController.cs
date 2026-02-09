@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using FormatVnShop.Data;
 using FormatVnShop.Models;
+using FormatVnShop.Services;
 
 namespace FormatVnShop.Controllers;
 
@@ -11,10 +12,14 @@ namespace FormatVnShop.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IVnpayService _vnpayService;
+    private readonly IConfiguration _configuration;
 
-    public OrdersController(ApplicationDbContext context)
+    public OrdersController(ApplicationDbContext context, IVnpayService vnpayService, IConfiguration configuration)
     {
         _context = context;
+        _vnpayService = vnpayService;
+        _configuration = configuration;
     }
 
     // GET: api/orders
@@ -106,7 +111,54 @@ public class OrdersController : ControllerBase
             return BadRequest($"Unable to create order: {ex.InnerException?.Message ?? ex.Message}");
         }
 
+        if (order.PaymentMethod == "VNPAY")
+        {
+            var paymentUrl = _vnpayService.CreatePaymentUrl(HttpContext, order);
+            return Ok(new { success = true, paymentUrl, orderId = order.Id });
+        }
+
         return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
+    }
+
+    // GET: api/orders/payment-callback
+    [HttpGet("payment-callback")]
+    public async Task<IActionResult> PaymentCallback()
+    {
+        if (Request.Query.Count > 0)
+        {
+            bool checkSignature = _vnpayService.ValidateSignature(Request.Query);
+            if (checkSignature)
+            {
+                var vnp_ResponseCode = Request.Query["vnp_ResponseCode"];
+                var vnp_TransactionStatus = Request.Query["vnp_TransactionStatus"];
+                var vnp_TxnRef = Request.Query["vnp_TxnRef"];
+                var vnp_TransactionNo = Request.Query["vnp_TransactionNo"];
+
+                if (int.TryParse(vnp_TxnRef, out int orderId))
+                {
+                    var order = await _context.Orders.FindAsync(orderId);
+                    if (order != null)
+                    {
+                        if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
+                        {
+                            order.PaymentStatus = "Paid";
+                            order.VnpayTransactionId = vnp_TransactionNo;
+                            order.Status = "Processing"; // Move to processing after payment
+                        }
+                        else
+                        {
+                            order.PaymentStatus = "Failed";
+                        }
+                        await _context.SaveChangesAsync();
+                        
+                        // Redirect to frontend result page
+                        var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5173";
+                        return Redirect($"{frontendUrl}/checkout/result?orderId={orderId}&status={(order.PaymentStatus == "Paid" ? "success" : "failed")}");
+                    }
+                }
+            }
+        }
+        return BadRequest("Invalid signature or transaction data");
     }
 
     // PUT: api/orders/5

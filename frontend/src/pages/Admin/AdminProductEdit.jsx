@@ -24,6 +24,7 @@ const AdminProductEdit = () => {
         categoryIds: [],
         imageUrl: '',
         stock: '',
+        weight: '',
         isFeatured: false,
         variants: []
     });
@@ -126,6 +127,7 @@ const AdminProductEdit = () => {
                 categoryIds: p.categories ? p.categories.map(c => c.id) : [],
                 imageUrl: p.imageUrl || '',
                 stock: p.stock,
+                weight: p.weight || 0,
                 isFeatured: p.isFeatured,
                 variants: p.variants || []
             });
@@ -192,6 +194,7 @@ const AdminProductEdit = () => {
                 ...formData,
                 price: parseFloat(formData.price),
                 stock: parseInt(formData.stock),
+                weight: parseInt(formData.weight) || 0,
                 categoryIds: formData.categoryIds.map(id => parseInt(id)),
                 variants: formData.variants.map(v => ({
                     ...v,
@@ -456,6 +459,17 @@ const AdminProductEdit = () => {
                                     onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                                     required
                                     min="0"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Trọng lượng (Grams) *</label>
+                                <input
+                                    type="number"
+                                    value={formData.weight}
+                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                                    required
+                                    min="0"
+                                    placeholder="Vd: 500"
                                 />
                             </div>
                             <div className="form-group">

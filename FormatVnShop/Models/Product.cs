@@ -8,6 +8,7 @@ public class Product : BaseEntity
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
     public int Stock { get; set; }
+    public int Weight { get; set; } // In grams
     public bool IsFeatured { get; set; }
     
     // Navigation property

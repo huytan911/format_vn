@@ -210,6 +210,39 @@ const CheckoutShipping = () => {
         }
     };
 
+    const [shippingFee, setShippingFee] = useState(0);
+    const [isCalculatingFee, setIsCalculatingFee] = useState(false);
+
+    // Calculate fee when address is selected
+    useEffect(() => {
+        if (selectedAddressId && cartItems.length > 0) {
+            calculateFee(selectedAddressId);
+        }
+    }, [selectedAddressId, cartItems]);
+
+    const calculateFee = async (addressId) => {
+        setIsCalculatingFee(true);
+        try {
+            const response = await api.post('/shipping/calculate', {
+                addressId: addressId,
+                items: cartItems.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity
+                }))
+            });
+
+            if (response.data.success) {
+                setShippingFee(response.data.fee);
+            }
+        } catch (error) {
+            console.error('Error calculating shipping fee:', error);
+            const message = error.response?.data?.message || 'Không thể tính phí vận chuyển';
+            showToast(message, 'error');
+        } finally {
+            setIsCalculatingFee(false);
+        }
+    };
+
     const handleContinue = () => {
         if (!selectedAddressId) {
             if (addresses.length === 0) {
@@ -230,7 +263,8 @@ const CheckoutShipping = () => {
                 city: selected.city,
                 district: selected.district,
                 ward: selected.ward,
-                note: selected.note
+                note: selected.note,
+                shippingFee: shippingFee
             };
 
             localStorage.setItem('checkout_shipping', JSON.stringify(shippingInfo));
@@ -362,11 +396,15 @@ const CheckoutShipping = () => {
                             </div>
                             <div className="total-row">
                                 <span>Phí vận chuyển</span>
-                                <span>Miễn phí</span>
+                                <span>
+                                    {isCalculatingFee ? 'Đang tính...' :
+                                        shippingFee > 0 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(shippingFee) :
+                                            'Miễn phí'}
+                                </span>
                             </div>
                             <div className="total-row final">
                                 <span>Tổng cộng</span>
-                                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal)}</span>
+                                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal + shippingFee)}</span>
                             </div>
                         </div>
                     </div>

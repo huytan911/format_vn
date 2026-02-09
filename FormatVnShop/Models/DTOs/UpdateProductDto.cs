@@ -18,6 +18,9 @@ public class UpdateProductDto
     
     [Range(0, int.MaxValue)]
     public int Stock { get; set; }
+
+    [Range(0, int.MaxValue)]
+    public int Weight { get; set; } // In grams
     
     public bool IsFeatured { get; set; }
     

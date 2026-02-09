@@ -1,19 +1,43 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { FiCheckCircle, FiXCircle, FiHome, FiArrowRight } from 'react-icons/fi';
 import usePageTitle from '../../hooks/usePageTitle';
+import api from '../../config/axiosConfig';
 import './Checkout.css'; // Re-use existing styles or add specific ones
 
 const CheckoutResult = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { status, orderId, orderNumber, message, success } = location.state || {}; // Expect state: { status: 'success' | 'failed', success: boolean, ... }
+    const searchParams = new URLSearchParams(location.search);
 
-    usePageTitle(success ? 'Đặt hàng thành công' : 'Kết quả đặt hàng');
+    // Get info from state (direct navigation from COD) or searchParams (redirect from VNPAY)
+    const [result, setResult] = useState({
+        status: location.state?.status || searchParams.get('status'),
+        orderId: location.state?.orderId || searchParams.get('orderId'),
+        orderNumber: location.state?.orderNumber,
+        message: location.state?.message
+    });
 
-    // Fallback if accessed directly without state
-    if (!status && success === undefined) { // Check both status and success for fallback
+    usePageTitle(result.status === 'success' ? 'Đặt hàng thành công' : 'Kết quả đặt hàng');
+
+    useEffect(() => {
+        // If we have orderId but no orderNumber (typical for VNPAY redirect), fetch it
+        if (result.orderId && !result.orderNumber) {
+            const fetchOrder = async () => {
+                try {
+                    const response = await api.get(`/orders/${result.orderId}`);
+                    setResult(prev => ({ ...prev, orderNumber: response.data.orderNumber }));
+                } catch (error) {
+                    console.error('Error fetching order details:', error);
+                }
+            };
+            fetchOrder();
+        }
+    }, [result.orderId, result.orderNumber]);
+
+    // Fallback if accessed directly without state or params
+    if (!result.status) {
         return (
             <div className="checkout-page">
                 <div className="container" style={{ textAlign: 'center', padding: '100px 20px' }}>
@@ -24,7 +48,7 @@ const CheckoutResult = () => {
         );
     }
 
-    const isSuccess = status === 'success';
+    const isSuccess = result.status === 'success';
 
     return (
         <div className="checkout-page">
@@ -44,13 +68,13 @@ const CheckoutResult = () => {
                 {isSuccess ? (
                     <div style={{ color: '#666', marginBottom: '40px', lineHeight: '1.6' }}>
                         <p>Cảm ơn bạn đã mua hàng tại Format Vn Shop.</p>
-                        <p>Mã đơn hàng của bạn là: <strong>{orderNumber}</strong></p>
+                        <p>Mã đơn hàng của bạn là: <strong>{result.orderNumber || `#${result.orderId}`}</strong></p>
                         <p>Chúng tôi sẽ sớm liên hệ với bạn để xác nhận đơn hàng.</p>
                     </div>
                 ) : (
                     <div style={{ color: '#666', marginBottom: '40px', lineHeight: '1.6' }}>
                         <p>Rất tiếc, đã có lỗi xảy ra trong quá trình xử lý đơn hàng.</p>
-                        {message && <p style={{ color: '#dc3545' }}>{message}</p>}
+                        {result.message && <p style={{ color: '#dc3545' }}>{result.message}</p>}
                         <p>Vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ.</p>
                     </div>
                 )}
