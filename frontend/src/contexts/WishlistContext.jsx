@@ -14,19 +14,25 @@ export const WishlistProvider = ({ children }) => {
     const { showToast } = useToast();
 
     useEffect(() => {
-        if (isAuthenticated && user?.role === 'Customer') {
-            fetchWishlist();
+        const controller = new AbortController();
+        const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+        // Only fetch if authenticated AND acting as a customer AND not on admin route
+        if (isAuthenticated && user?.role === 'Customer' && !isAdminRoute) {
+            fetchWishlist(controller.signal);
         } else {
             setWishlistItems([]);
         }
+        return () => controller.abort();
     }, [isAuthenticated, user]);
 
-    const fetchWishlist = async () => {
+    const fetchWishlist = async (signal) => {
         setIsLoading(true);
         try {
-            const response = await api.get('/wishlist');
+            const response = await api.get('/wishlist', { signal });
             setWishlistItems(response.data);
         } catch (error) {
+            if (error.code === 'ERR_CANCELED') return;
             console.error('Error fetching wishlist:', error);
         } finally {
             setIsLoading(false);

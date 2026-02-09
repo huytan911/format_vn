@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import usePageTitle from '../../hooks/usePageTitle';
 import './Auth.css';
 
 const CustomerLogin = () => {
@@ -8,6 +10,8 @@ const CustomerLogin = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    usePageTitle('Đăng nhập');
     const { login } = useAuth();
     const navigate = useNavigate();
 

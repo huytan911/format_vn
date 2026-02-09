@@ -3,22 +3,29 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, adminUser, isAuthenticated, isAdminAuthenticated } = useAuth();
 
-    if (!isAuthenticated) {
-        // If checking for Customer role (or no specific role), redirect to customer login
-        if (allowedRoles && allowedRoles.includes('Customer')) {
+    // Check if the route is intended for Customers
+    const isCustomerRoute = allowedRoles && allowedRoles.includes('Customer');
+
+    if (isCustomerRoute) {
+        if (!isAuthenticated) {
             return <Navigate to="/login" replace />;
         }
+        // If logged in but somehow not a customer (shouldn't happen with current logic as user is only customer), check role anyway
+        if (allowedRoles && !allowedRoles.includes(user.role)) {
+            return <Navigate to="/" replace />;
+        }
+        return children ? children : <Outlet />;
+    }
+
+    // Otherwise, assume it's an Admin route
+    if (!isAdminAuthenticated) {
         return <Navigate to="/admin/login" replace />;
     }
 
-    if (allowedRoles && !allowedRoles.includes(user.role)) {
-        if (user.role === 'Customer') {
-            // Customer trying to access Admin
-            return <Navigate to="/" replace />; // Or 403 page
-        }
-        return <Navigate to="/admin/login" replace />;
+    if (allowedRoles && !allowedRoles.includes(adminUser?.role)) {
+        return <Navigate to="/admin" replace />; // or some forbidden page
     }
 
     return children ? children : <Outlet />;

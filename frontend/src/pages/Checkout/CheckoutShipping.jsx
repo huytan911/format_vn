@@ -5,15 +5,18 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useToast } from '../../contexts/ToastContext';
 import { FiArrowLeft, FiChevronRight, FiPlus, FiMapPin, FiTrash2 } from 'react-icons/fi';
+import usePageTitle from '../../hooks/usePageTitle';
 import Modal from '../../components/Modal/Modal';
 import api from '../../config/axiosConfig'; // Backend API
 import './Checkout.css';
 
 const CheckoutShipping = () => {
     const { user } = useAuth();
-    const { cartItems, cartTotal } = useCart();
+    const { cartItems, cartTotal, isLoading: isCartLoading } = useCart();
     const { showToast } = useToast();
     const navigate = useNavigate();
+
+    usePageTitle('Thông tin giao hàng');
 
     const [addresses, setAddresses] = useState([]);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -124,10 +127,10 @@ const CheckoutShipping = () => {
 
     // Check cart
     useEffect(() => {
-        if (cartItems.length === 0) {
+        if (!isCartLoading && cartItems.length === 0) {
             navigate('/cart');
         }
-    }, [cartItems, navigate]);
+    }, [cartItems, navigate, isCartLoading]);
 
     const handleAddressChange = (e) => {
         const { name, value, type, checked } = e.target;

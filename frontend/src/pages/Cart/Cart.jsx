@@ -1,12 +1,17 @@
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
+import usePageTitle from '../../hooks/usePageTitle';
 import { FiTrash2, FiMinus, FiPlus, FiArrowLeft } from 'react-icons/fi';
 import { getImageUrl } from '../../utils/imageUrl';
 import './Cart.css';
 
 const Cart = () => {
     const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal, isLoading } = useCart();
+    const navigate = useNavigate();
+
+    usePageTitle('Giỏ hàng');
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {

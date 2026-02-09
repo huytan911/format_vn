@@ -9,51 +9,68 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const { isAuthenticated, user } = useAuth();
+    const [isLoading, setIsLoading] = useState(true); // Default to true to prevent premature redirects
+    const { isAuthenticated, user, loading: authLoading } = useAuth();
     const { showToast } = useToast();
 
-    // Load from localStorage on mount (for Guest)
+    // Load from localStorage on mount (for Guest or non-Customer users)
     useEffect(() => {
+        // Wait for auth to finish loading
+        if (authLoading) return;
+
         const savedCart = localStorage.getItem('guest_cart');
-        if (!isAuthenticated) {
+        // Treat as guest if NOT authenticated OR if authenticated but NOT a customer (e.g. Admin)
+        if (!isAuthenticated || user?.role !== 'Customer') {
             if (savedCart) {
                 setCartItems(JSON.parse(savedCart));
             }
+            setIsLoading(false); // Loading complete
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, authLoading, user]);
 
     // Sync with backend on login
     useEffect(() => {
-        if (isAuthenticated && user?.role === 'Customer') {
-            syncAndFetchCart();
+        const controller = new AbortController();
+        const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+        if (isAuthenticated) {
+            if (user?.role === 'Customer' && !isAdminRoute) {
+                syncAndFetchCart(controller.signal);
+            } else {
+                // If not a customer (e.g. Admin) or on admin route, just stop loading
+                setIsLoading(false);
+            }
         }
+        return () => controller.abort();
     }, [isAuthenticated, user]);
 
-    const syncAndFetchCart = async () => {
-        setIsLoading(true);
+    const syncAndFetchCart = async (signal) => {
+        // setIsLoading(true); // Already true initially, or if re-syncing
         try {
             // First, get guest cart if any
             const guestCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
 
             // Sync each item to backend
             for (const item of guestCart) {
+                // We pass signal to sync requests too, to abort them if component unmounts
                 await api.post('/cart', {
                     productId: item.productId,
                     productVariantId: item.productVariantId,
                     quantity: item.quantity
-                });
+                }, { signal });
             }
 
             // Clear guest cart
             localStorage.removeItem('guest_cart');
 
             // Fetch the combined cart from backend
-            const response = await api.get('/cart');
+            const response = await api.get('/cart', { signal });
             setCartItems(response.data);
+            setIsLoading(false);
         } catch (error) {
+            if (error.code === 'ERR_CANCELED') return;
             console.error('Error syncing/fetching cart:', error);
-        } finally {
+            showToast('Không thể tải giỏ hàng', 'error');
             setIsLoading(false);
         }
     };

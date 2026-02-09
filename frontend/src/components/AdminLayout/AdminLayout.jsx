@@ -5,13 +5,12 @@ import './AdminLayout.css';
 
 const AdminLayout = ({ children }) => {
     const location = useLocation();
-    const { user, logout } = useAuth();
-
+    const { adminUser, logout } = useAuth();
     const menuItems = [
         { path: '/admin/products', label: 'Sản phẩm', icon: '📦' },
-        { path: '/admin/categories', label: 'Danh mục', icon: '📁' },
+        { path: '/admin/categories', label: 'Danh mục', icon: '📂' },
         { path: '/admin/customers', label: 'Khách hàng', icon: '👥' },
-        { path: '/admin/orders', label: 'Đơn hàng', icon: '🛒' },
+        { path: '/admin/orders', label: 'Đơn hàng', icon: '🧾' }
     ];
 
     return (
@@ -24,11 +23,11 @@ const AdminLayout = ({ children }) => {
 
                 <div className="user-profile">
                     <div className="user-avatar">
-                        {user?.username?.charAt(0).toUpperCase() || 'A'}
+                        {adminUser?.username?.charAt(0).toUpperCase() || 'A'}
                     </div>
                     <div className="user-info">
-                        <span className="username">{user?.username}</span>
-                        <span className="role-badge">{user?.role}</span>
+                        <span className="username">{adminUser?.username}</span>
+                        <span className="role-badge">{adminUser?.role}</span>
                     </div>
                 </div>
 
@@ -44,7 +43,7 @@ const AdminLayout = ({ children }) => {
                         </Link>
                     ))}
 
-                    <button onClick={logout} className="nav-item logout-btn">
+                    <button onClick={() => logout('admin')} className="nav-item logout-btn">
                         <span className="nav-icon">🚪</span>
                         <span className="nav-label">Đăng xuất</span>
                     </button>

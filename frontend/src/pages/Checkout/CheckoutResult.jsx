@@ -1,14 +1,19 @@
+
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { FiCheckCircle, FiXCircle, FiHome, FiArrowRight } from 'react-icons/fi';
+import usePageTitle from '../../hooks/usePageTitle';
 import './Checkout.css'; // Re-use existing styles or add specific ones
 
 const CheckoutResult = () => {
     const location = useLocation();
-    const { status, orderId, orderNumber, message } = location.state || {}; // Expect state: { status: 'success' | 'failed', ... }
+    const navigate = useNavigate();
+    const { status, orderId, orderNumber, message, success } = location.state || {}; // Expect state: { status: 'success' | 'failed', success: boolean, ... }
+
+    usePageTitle(success ? 'Đặt hàng thành công' : 'Kết quả đặt hàng');
 
     // Fallback if accessed directly without state
-    if (!status) {
+    if (!status && success === undefined) { // Check both status and success for fallback
         return (
             <div className="checkout-page">
                 <div className="container" style={{ textAlign: 'center', padding: '100px 20px' }}>

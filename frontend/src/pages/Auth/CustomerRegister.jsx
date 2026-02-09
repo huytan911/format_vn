@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import usePageTitle from '../../hooks/usePageTitle';
 import './Auth.css';
 
 const CustomerRegister = () => {
@@ -14,6 +15,8 @@ const CustomerRegister = () => {
     });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    usePageTitle('Đăng ký tài khoản');
     const { register } = useAuth();
     const navigate = useNavigate();
 

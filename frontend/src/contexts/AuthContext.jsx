@@ -4,18 +4,45 @@ import api from '../config/axiosConfig';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+    // Customer state
     const [user, setUser] = useState(null);
+    // Admin state
+    const [adminUser, setAdminUser] = useState(null);
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for stored token and user on mount
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        try {
+            // Check for stored customer
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+            if (storedToken && storedUser) {
+                try {
+                    setUser(JSON.parse(storedUser));
+                } catch (e) {
+                    console.error('Error parsing stored user:', e);
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                }
+            }
 
-        if (storedToken && storedUser) {
-            setUser(JSON.parse(storedUser));
+            // Check for stored admin
+            const storedAdminToken = localStorage.getItem('adminToken');
+            const storedAdminUser = localStorage.getItem('adminUser');
+            if (storedAdminToken && storedAdminUser) {
+                try {
+                    setAdminUser(JSON.parse(storedAdminUser));
+                } catch (e) {
+                    console.error('Error parsing stored admin user:', e);
+                    localStorage.removeItem('adminUser');
+                    localStorage.removeItem('adminToken');
+                }
+            }
+        } catch (error) {
+            console.error('Error initializing auth:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
 
     const login = async (email, password, isAdmin = false) => {
@@ -24,16 +51,26 @@ export const AuthProvider = ({ children }) => {
             const response = await api.post(endpoint, { email, password });
             const { token, ...userData } = response.data;
 
-            localStorage.setItem('token', token);
-
-            const userObj = {
-                name: userData.username || userData.name,
-                email: userData.email,
-                role: userData.role
-            };
-
-            localStorage.setItem('user', JSON.stringify(userObj));
-            setUser(userObj);
+            if (isAdmin) {
+                localStorage.setItem('adminToken', token);
+                const userObj = {
+                    name: userData.username || userData.name,
+                    username: userData.username, // specific to admin
+                    email: userData.email,
+                    role: userData.role
+                };
+                localStorage.setItem('adminUser', JSON.stringify(userObj));
+                setAdminUser(userObj);
+            } else {
+                localStorage.setItem('token', token);
+                const userObj = {
+                    name: userData.username || userData.name,
+                    email: userData.email,
+                    role: userData.role
+                };
+                localStorage.setItem('user', JSON.stringify(userObj));
+                setUser(userObj);
+            }
 
             return { success: true };
         } catch (error) {
@@ -71,22 +108,31 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
-        const role = user?.role;
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-
-        // Use window.location.href to fully reset the application state on logout
-        if (role === 'Customer') {
-            window.location.href = '/';
+    const logout = (type = 'customer') => {
+        if (type === 'admin') {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            setAdminUser(null);
+            window.location.href = '/admin/login';
         } else {
-            window.location.href = '/login';
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setUser(null);
+            window.location.href = '/';
         }
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading, isAuthenticated: !!user, isAdmin: user?.role !== 'Customer' && !!user }}>
+        <AuthContext.Provider value={{
+            user, // Customer user
+            adminUser, // Admin user
+            login,
+            register,
+            logout,
+            loading,
+            isAuthenticated: !!user,
+            isAdminAuthenticated: !!adminUser
+        }}>
             {!loading && children}
         </AuthContext.Provider>
     );

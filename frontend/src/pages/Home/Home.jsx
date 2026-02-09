@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import usePageTitle from '../../hooks/usePageTitle';
 import Hero from '../../components/Hero/Hero';
 import ProductGrid from '../../components/ProductGrid/ProductGrid';
 import { productsAPI } from '../../services/api';
@@ -7,6 +8,8 @@ import './Home.css';
 const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    usePageTitle('Trang chủ');
 
     useEffect(() => {
         const fetchFeaturedProducts = async () => {

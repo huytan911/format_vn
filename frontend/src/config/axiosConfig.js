@@ -10,7 +10,9 @@ const api = axios.create({
 // Add a request interceptor to attach the token
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
+        const isAdminRoute = window.location.pathname.startsWith('/admin');
+        const token = isAdminRoute ? localStorage.getItem('adminToken') : localStorage.getItem('token');
+
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -25,9 +27,17 @@ api.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             // Clear local storage and redirect to login if token is invalid/expired
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
+            const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+            if (isAdminRoute) {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                window.location.href = '/admin/login';
+            } else {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }

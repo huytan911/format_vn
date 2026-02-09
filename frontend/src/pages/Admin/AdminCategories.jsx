@@ -3,11 +3,15 @@ import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
 import Modal from '../../components/Modal/Modal';
-import ImageUpload from '../../components/ImageUpload/ImageUpload';
+
 
 import { getImageUrl } from '../../utils/imageUrl';
 
+
+import usePageTitle from '../../hooks/usePageTitle';
+
 const AdminCategories = () => {
+    usePageTitle('Quản lý Danh mục');
     const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -20,7 +24,7 @@ const AdminCategories = () => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        imageUrl: '',
+
         parentId: ''
     });
 
@@ -39,7 +43,7 @@ const AdminCategories = () => {
 
     const handleCreate = () => {
         setSelectedCategory(null);
-        setFormData({ name: '', description: '', imageUrl: '', parentId: '' });
+        setFormData({ name: '', description: '', parentId: '' });
         setIsModalOpen(true);
     };
 
@@ -48,7 +52,7 @@ const AdminCategories = () => {
         setFormData({
             name: category.name,
             description: category.description || '',
-            imageUrl: category.imageUrl || '',
+
             parentId: category.parentId || ''
         });
         setIsModalOpen(true);
@@ -106,17 +110,7 @@ const AdminCategories = () => {
     };
 
     const columns = [
-        {
-            header: 'Ảnh',
-            accessor: 'imageUrl',
-            render: (item) => (
-                <img
-                    src={getImageUrl(item.imageUrl)}
-                    alt={item.name}
-                    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
-                />
-            )
-        },
+
         { header: 'ID', accessor: 'id', sortable: true },
         { header: 'Tên danh mục', accessor: 'name', sortable: true },
         {
@@ -206,14 +200,7 @@ const AdminCategories = () => {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Hình ảnh</label>
-                        <ImageUpload
-                            value={formData.imageUrl}
-                            onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-                            folder="categories"
-                        />
-                    </div>
+
 
                     <div className="form-actions">
                         <button type="button" className="btn-secondary" onClick={() => setIsModalOpen(false)}>

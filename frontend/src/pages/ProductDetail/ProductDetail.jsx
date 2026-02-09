@@ -1,5 +1,7 @@
+
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import usePageTitle from '../../hooks/usePageTitle';
 import { productsAPI } from '../../services/api';
 import { FiShoppingBag, FiHeart } from 'react-icons/fi';
 import { useCart } from '../../contexts/CartContext';
@@ -13,6 +15,7 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [selectedVariant, setSelectedVariant] = useState(null);
+    usePageTitle(product ? product.name : 'Chi tiết sản phẩm');
     const [selectedColor, setSelectedColor] = useState(null);
     const [selectedSize, setSelectedSize] = useState(null);
     const [activeTab, setActiveTab] = useState('description');

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import usePageTitle from '../../hooks/usePageTitle';
 import ProductGrid from '../../components/ProductGrid/ProductGrid';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import { FiSearch, FiSliders } from 'react-icons/fi';
@@ -10,6 +11,8 @@ const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [category, setCategory] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    usePageTitle(category ? category.name : 'Sản phẩm');
 
     // Filter & Sort State
     const [searchTerm, setSearchTerm] = useState('');

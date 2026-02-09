@@ -3,23 +3,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useToast } from '../../contexts/ToastContext';
+import usePageTitle from '../../hooks/usePageTitle';
 import api from '../../config/axiosConfig';
 import { FiArrowLeft, FiCheck } from 'react-icons/fi';
 import './Checkout.css';
 
 const CheckoutPayment = () => {
     const { user } = useAuth();
-    const { cartItems, cartTotal, clearCart } = useCart();
+    const { cartItems, cartTotal, clearCart, isLoading } = useCart();
     const { showToast } = useToast();
     const navigate = useNavigate();
+
+    usePageTitle('Thanh toán');
 
     const [shippingInfo, setShippingInfo] = useState(null);
     const [paymentMethod, setPaymentMethod] = useState('COD');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [orderPlaced, setOrderPlaced] = useState(false); // Flag to prevent redirect to cart
+    const [orderPlaced, setOrderPlaced] = useState(false);
+
+    const getImageUrl = (path) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `http://localhost:5149${path}`;
+    };
 
     useEffect(() => {
-        // Load shipping info
         const savedShipping = localStorage.getItem('checkout_shipping');
         if (!savedShipping) {
             navigate('/checkout/shipping');
@@ -27,11 +35,10 @@ const CheckoutPayment = () => {
         }
         setShippingInfo(JSON.parse(savedShipping));
 
-        // Check cart - Only redirect if order NOT placed successfully
-        if (cartItems.length === 0 && !orderPlaced) {
+        if (!isLoading && cartItems.length === 0 && !orderPlaced) {
             navigate('/cart');
         }
-    }, [navigate, cartItems, orderPlaced]);
+    }, [navigate, cartItems, orderPlaced, isLoading]);
 
     const handlePlaceOrder = async () => {
         if (!shippingInfo || !user) return;
@@ -40,10 +47,9 @@ const CheckoutPayment = () => {
         try {
             const fullAddress = `${shippingInfo.address}, ${shippingInfo.ward}, ${shippingInfo.district}, ${shippingInfo.city}`;
 
-            // Construct payload matching Order model
             const orderData = {
-                customerId: user.id || 0, // Should be handled by backend token ideally, but model has it
-                orderNumber: "", // Backend generates this
+                customerId: user.id || 0,
+                orderNumber: "",
                 orderDate: new Date().toISOString(),
                 totalAmount: cartTotal,
                 status: "Pending",
@@ -59,8 +65,7 @@ const CheckoutPayment = () => {
             const response = await api.post('/orders', orderData);
 
             if (response.status === 201 || response.status === 200) {
-                // Order created successfully
-                setOrderPlaced(true); // Prevent cart redirect
+                setOrderPlaced(true);
                 await clearCart();
                 localStorage.removeItem('checkout_shipping');
                 navigate('/checkout/result', {
@@ -73,7 +78,6 @@ const CheckoutPayment = () => {
             }
         } catch (error) {
             console.error('Order creation failed:', error);
-            // Navigate to result page with failure status
             navigate('/checkout/result', {
                 state: {
                     status: 'failed',
@@ -180,7 +184,7 @@ const CheckoutPayment = () => {
                         <div className="summary-items">
                             {cartItems.map(item => (
                                 <div key={item.id} className="summary-item">
-                                    <img src={item.imageUrl} alt={item.productName} className="summary-item-image" />
+                                    <img src={getImageUrl(item.imageUrl)} alt={item.productName} className="summary-item-image" />
                                     <div className="summary-item-info">
                                         <span className="summary-item-title">{item.productName}</span>
                                         {item.variantName && <div className="summary-item-variant">{item.variantName}</div>}

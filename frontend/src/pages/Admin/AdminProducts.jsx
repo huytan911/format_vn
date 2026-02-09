@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import usePageTitle from '../../hooks/usePageTitle';
 import api from '../../config/axiosConfig';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import DataTable from '../../components/DataTable/DataTable';
@@ -12,6 +13,7 @@ import { getImageUrl } from '../../utils/imageUrl';
 
 const AdminProducts = () => {
     const navigate = useNavigate();
+    usePageTitle('Quản lý Sản phẩm');
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
