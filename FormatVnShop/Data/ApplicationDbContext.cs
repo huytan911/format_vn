@@ -75,9 +75,9 @@ public class ApplicationDbContext : DbContext
         
         // Seed Categories
         modelBuilder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "NỮ", Description = "Thời trang nữ", ImageUrl = "/images/categories/nu.jpg" },
-            new Category { Id = 2, Name = "NAM", Description = "Thời trang nam", ImageUrl = "/images/categories/nam.jpg" },
-            new Category { Id = 3, Name = "PHỤ KIỆN", Description = "Phụ kiện thời trang", ImageUrl = "/images/categories/phukien.jpg" }
+            new Category { Id = 1, Name = "NỮ", Description = "Thời trang nữ" },
+            new Category { Id = 2, Name = "NAM", Description = "Thời trang nam" },
+            new Category { Id = 3, Name = "PHỤ KIỆN", Description = "Phụ kiện thời trang" }
         );
         
         // Seed Products
