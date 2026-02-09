@@ -265,6 +265,30 @@ public class ProductsController : ControllerBase
             
         return products.Select(MapToDto).ToList();
     }
+
+    // GET: api/products/suggestions?q=term
+    [HttpGet("suggestions")]
+    public async Task<ActionResult<IEnumerable<object>>> GetProductSuggestions([FromQuery] string q)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+        {
+            return Ok(new List<object>());
+        }
+
+        var suggestions = await _context.Products
+            .Where(p => p.Name.Contains(q))
+            .Take(8)
+            .Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Price,
+                p.ImageUrl
+            })
+            .ToListAsync();
+
+        return Ok(suggestions);
+    }
     
     // POST: api/products
     [HttpPost]
